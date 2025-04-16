@@ -1,4 +1,4 @@
-# --- 기본 Unity 프로젝트 무시 설정 ---
+# --- Unity 기본 무시 설정 ---
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -8,7 +8,6 @@
 /[Uu]ser[Ss]ettings/
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
-# /[Aa]ssets/AssetStoreTools*
 /[Aa]ssets/Plugins/Editor/JetBrains*
 .vs/
 .gradle/
@@ -38,19 +37,22 @@ sysinfo.txt
 *.app
 crashlytics-build.properties
 
-# --- Firebase SDK 무시 설정 ---
+# --- Firebase SDK 관련 무시 설정 ---
 Assets/Plugins/Firebase/*
 !Assets/Plugins/Firebase/*.meta
 !Assets/Plugins/Firebase/Editor/*.meta
+
+Assets/Firebase/Plugins/x86_64/
+Assets/Firebase/Plugins/x86/
 
 Assets/ExternalDependencyManager/
 Assets/PlayServicesResolver/
 Assets/GeneratedLocalRepo/
 
-# --- Firebase 설정 파일은 포함 ---
+# --- Firebase 설정 파일은 포함해야 하므로 제외하지 않음 ---
 !Assets/google-services.json
 
-# --- Addressables 관련 무시 설정 ---
+# --- Addressables 무시 설정 ---
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
