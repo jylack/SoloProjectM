@@ -1286,7 +1286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Camera_Move: 1
-  Camera_MoveSpeed: 3
+  Camera_MoveSpeed: 10
   Layer_Speed:
   - 1
   - 0.9
@@ -1578,6 +1578,7 @@ Transform:
   - {fileID: 611127750}
   - {fileID: 690893754}
   - {fileID: 584374083}
+  - {fileID: 2032462567}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1567634626
@@ -1975,12 +1976,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2032462565}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1469282283}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2096052136
 GameObject:
@@ -2158,5 +2159,4 @@ SceneRoots:
   - {fileID: 1327459644}
   - {fileID: 850621840}
   - {fileID: 141917776}
-  - {fileID: 2032462567}
   - {fileID: 1263076629}
