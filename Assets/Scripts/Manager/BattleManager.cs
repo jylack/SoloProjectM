@@ -28,13 +28,16 @@ public class BattleManager : MonoBehaviour
         playerStats = playerTransform.GetComponent<Player>().stats;
         monsterStats = monsterTransform.GetComponent<Monster>().Stats;
 
-        battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
 
         StartCoroutine(StartBattle());
     }
 
     private IEnumerator StartBattle()
     {
+        yield return new WaitUntil(()=> GameManager.instance != null); // 전투 시작 대기
+        battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
+
+
         // 연출: 플레이어 왼쪽으로 이동
         Vector3 playerStart = playerTransform.position;
         Vector3 playerTarget = playerStart + new Vector3(1f, 0, 0);
