@@ -99,7 +99,7 @@ public class BattleManager : MonoBehaviour
                 currentDefender.TakeDamage(currentAttacker.Attack);
 
                 battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! adsfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfasdfsadfasdfasdfsadfsadfs");
-                Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
+                //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
 
                 //방어자 죽었는가 판별
                 if (currentDefender.IsDead) break;
@@ -112,7 +112,7 @@ public class BattleManager : MonoBehaviour
 
                 if (currentDefender == playerStats)
                 {
-                    Debug.Log("Player is dead");
+                    //Debug.Log("Player is dead");
                     battleLogUI.AddLog("Player is dead");
                     yield return new WaitForSeconds(1f);
                     SceneManager.LoadScene(SceneName.RoomScene.ToString());
@@ -120,7 +120,7 @@ public class BattleManager : MonoBehaviour
                 else
                 {
                     battleLogUI.AddLog("Monster is dead");
-                    Debug.Log("Monster is dead");
+                    //Debug.Log("Monster is dead");
                     Destroy(monsterTransform.GetChild(0).gameObject, 1f);
                 }
 

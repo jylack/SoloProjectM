@@ -12,15 +12,15 @@ public class LogUI : MonoBehaviour
     //스테이지 시작 날짜 로그
     public void AddDayLog(int day, string message)
     {
-        GameObject logItem = Instantiate(logTextPrefab, contentRoot);
+        GameObject logPref = Instantiate(logTextPrefab, contentRoot);
 
-        logItem.transform.GetChild(0).gameObject.SetActive(true); // 이미지 비활성화
+        logPref.transform.GetChild(0).gameObject.SetActive(true); // 이미지 비활성화
 
-        TMP_Text dayText = logItem.transform.Find("Day")?.GetComponent<TMP_Text>();
+        TMP_Text dayText = logPref.transform.Find("Day")?.GetComponent<TMP_Text>();
         if (dayText != null)
             dayText.text = " " + day + "일차";
 
-        TMP_Text messageText = logItem.transform.Find("LogImg/MessageText")?.GetComponent<TMP_Text>();
+        TMP_Text messageText = logPref.transform.Find("LogImg/MessageText")?.GetComponent<TMP_Text>();
         if (messageText != null)
             messageText.text = message;
 
@@ -31,29 +31,33 @@ public class LogUI : MonoBehaviour
     //일반 로그
     public void AddLog(string message)
     {
-        GameObject logItem = Instantiate(logTextPrefab, contentRoot);
-        var dayText = logItem.transform.GetChild(0).gameObject;
-        var logImage = logItem.transform.GetChild(1).gameObject;
+        GameObject logPref = Instantiate(logTextPrefab, contentRoot);
+        var dayText = logPref.transform.GetChild(0).gameObject;
+        var logImage = logPref.transform.GetChild(1).gameObject;
 
         dayText.gameObject.SetActive(false); // 날짜 비활성화
 
-        TMP_Text messageText = logItem.transform.Find("LogImg/MessageText")?.GetComponent<TMP_Text>();
+        TMP_Text messageText = logPref.transform.Find("LogImg/MessageText")?.GetComponent<TMP_Text>();
 
-        var line = messageText.textInfo.lineCount;
-
-        Debug.Log(logImage.GetComponent<RectTransform>().sizeDelta.y);
-
-
-        var size = logImage.GetComponent<RectTransform>().sizeDelta;
-        var sizeY = size.y + ((line) * 50); // 50은 줄 간격
-        Debug.Log(sizeY);
-        size = new Vector2(size.x, sizeY); // 이미지 크기 조정
-        logImage.GetComponent<RectTransform>().sizeDelta = size;
-
-        Debug.Log(logImage.GetComponent<RectTransform>().sizeDelta.y);
 
         if (messageText != null)
+        {
             messageText.text = message;
+            messageText.ForceMeshUpdate();
+        }
+
+
+        var line = messageText.textInfo.lineCount;
+        var size = logImage.GetComponent<RectTransform>().sizeDelta;
+        var sizeY = size.y + ((line) * 50); // 50은 줄 간격
+
+        
+        size = new Vector2(size.x, sizeY); // 이미지 크기 조정
+
+        logImage.GetComponent<RectTransform>().position = dayText.transform.position; // 위치 초기화
+        logImage.GetComponent<RectTransform>().sizeDelta = size;
+        logPref.GetComponent<RectTransform>().sizeDelta = size; // 로그 아이템 크기 조정
+
 
         StartCoroutine(ScrollToBottomNextFrame());
     }
