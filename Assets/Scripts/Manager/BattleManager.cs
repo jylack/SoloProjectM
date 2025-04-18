@@ -1,10 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] private UnitStats playerStats;
-    [SerializeField] private UnitStats monsterStats;
+    private UnitStats playerStats;
+    private UnitStats monsterStats;
+
+    [SerializeField] private LogUI battleLogUI;
 
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform monsterTransform;
@@ -17,8 +20,16 @@ public class BattleManager : MonoBehaviour
     private UnitStats currentAttacker;
     private UnitStats currentDefender;
 
-    private void Start()
+
+
+
+    private void OnEnable()
     {
+        playerStats = playerTransform.GetComponent<Player>().stats;
+        monsterStats = monsterTransform.GetComponent<Monster>().Stats;
+
+        battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
+
         StartCoroutine(StartBattle());
     }
 
@@ -26,7 +37,7 @@ public class BattleManager : MonoBehaviour
     {
         // 연출: 플레이어 왼쪽으로 이동
         Vector3 playerStart = playerTransform.position;
-        Vector3 playerTarget = playerStart + new Vector3(1f,0,0) ;
+        Vector3 playerTarget = playerStart + new Vector3(1f, 0, 0);
         yield return MoveOverTime(playerTransform, playerStart, playerTarget, moveDuration);
 
         // 연출: 몬스터 오른쪽 바깥에서 등장
@@ -40,11 +51,13 @@ public class BattleManager : MonoBehaviour
         // 연출: 배경 카메라 이동중지
         parallaxBackground.Camera_Move = false;
 
+        //아래부터 전투
         DecideFirstTurn();
 
         yield return StartCoroutine(CombatLoop());
     }
 
+    //누가 먼저 싸울꺼냐!
     private void DecideFirstTurn()
     {
         if (playerStats.Speed > monsterStats.Speed)
@@ -71,34 +84,63 @@ public class BattleManager : MonoBehaviour
                 currentDefender = playerStats;
             }
         }
+
+        battleLogUI.AddLog(currentAttacker.Name + "이(가) 먼저 공격합니다!");
     }
 
     private IEnumerator CombatLoop()
     {
+        //누군가 죽을때까지 싸운다.
         while (!playerStats.IsDead && !monsterStats.IsDead)
         {
+            //공격자가 공격횟수만큼 공격
             for (int i = 0; i < currentAttacker.AttackCount; i++)
             {
                 currentDefender.TakeDamage(currentAttacker.Attack);
-                
+
+                battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! adsfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfasdfsadfasdfasdfsadfsadfs");
+                Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
+
+                //방어자 죽었는가 판별
                 if (currentDefender.IsDead) break;
                 yield return new WaitForSeconds(attackDelay);
             }
 
+            //방어자가 죽었는가 판별
             if (currentDefender.IsDead)
             {
-                Debug.Log("die");
-                // 연출: 배경 카메라 이동중지
+
+                if (currentDefender == playerStats)
+                {
+                    Debug.Log("Player is dead");
+                    battleLogUI.AddLog("Player is dead");
+                    yield return new WaitForSeconds(1f);
+                    SceneManager.LoadScene(SceneName.RoomScene.ToString());
+                }
+                else
+                {
+                    battleLogUI.AddLog("Monster is dead");
+                    Debug.Log("Monster is dead");
+                    Destroy(monsterTransform.GetChild(0).gameObject, 1f);
+                }
+
+                yield return new WaitForSeconds(1f);
+
+                //배경 카메라 이동시작
                 parallaxBackground.Camera_Move = true;
                 yield break;
             }
 
             // 턴 교체
             (currentAttacker, currentDefender) = (currentDefender, currentAttacker);
+
+
+
             yield return new WaitForSeconds(0.5f);
         }
     }
 
+    //무빙 무빙 
     private IEnumerator MoveOverTime(Transform target, Vector3 from, Vector3 to, float duration)
     {
         float elapsed = 0f;

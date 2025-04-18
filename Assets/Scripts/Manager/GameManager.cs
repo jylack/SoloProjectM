@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
+    public int currentDay = 1; // 현재 날짜
+
     private void Awake()
     {
         if (instance == null)
