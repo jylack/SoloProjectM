@@ -51,7 +51,7 @@ public class LogUI : MonoBehaviour
         var size = logImage.GetComponent<RectTransform>().sizeDelta;
         var sizeY = size.y + ((line) * 50); // 50은 줄 간격
 
-        
+
         size = new Vector2(size.x, sizeY); // 이미지 크기 조정
 
         logImage.GetComponent<RectTransform>().position = dayText.transform.position; // 위치 초기화

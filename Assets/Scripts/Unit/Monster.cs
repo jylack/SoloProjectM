@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Monster : MonoBehaviour
-{
-    public UnitStats Stats = new UnitStats("Monster",100, 10, 5, 1);
-    
+{    
+    [SerializeField] MonsterSO monsterSO;
+    private UnitStats _unitStats;
 
+    public UnitStats Stats => _unitStats;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-
+        _unitStats = monsterSO.Stats;
+        //Debug.Log(_unitStats.Name);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-    }
 }

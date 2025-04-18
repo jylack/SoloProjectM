@@ -1,150 +1,223 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
-    private UnitStats playerStats;
-    private UnitStats monsterStats;
-
-    [SerializeField] private LogUI battleLogUI;
-
     [SerializeField] private Transform playerTransform;
-    [SerializeField] private Transform monsterTransform;
-
+    [SerializeField] private Transform monsterSpawnRoot;
+    [SerializeField] private LogUI battleLogUI;
+    [SerializeField] private StateUIManager stateUIManager;
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private float attackDelay = 0.5f;
 
-    [SerializeField] private ParallaxBackground_0 parallaxBackground;
+    private UnitStats playerStats;
+    private List<UnitStats> monsterStatsList = new List<UnitStats>();
+    private List<BuffSystem> monsterBuffsList = new List<BuffSystem>();
 
-    private UnitStats currentAttacker;
-    private UnitStats currentDefender;
+    private Action<bool> onBattleEndCallback;
 
+    private BuffSystem playerBuffs = new BuffSystem();
+    private int turnIndex = 0;
+    private int playerTurnCount = 0;
 
+    private List<Skill> playerSkills;
 
-
-    private void OnEnable()
+    public void StartBattle(UnitStats player, List<UnitStats> monsters, Action<bool> onBattleEnd)
     {
-        playerStats = playerTransform.GetComponent<Player>().stats;
-        monsterStats = monsterTransform.GetComponent<Monster>().Stats;
+        playerStats = player;
+        monsterStatsList = monsters;
+        onBattleEndCallback = onBattleEnd;
 
-        battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
+        playerBuffs.Clear();
+        monsterBuffsList.Clear();
 
-        StartCoroutine(StartBattle());
+        foreach (var m in monsterStatsList)
+            monsterBuffsList.Add(new BuffSystem());
+
+        playerSkills = GameManager.instance.PlayerSkills;
+
+        stateUIManager.RefreshUI();
+        StartCoroutine(BattleRoutine());
     }
 
-    private IEnumerator StartBattle()
+    private IEnumerator BattleRoutine()
     {
-        // 연출: 플레이어 왼쪽으로 이동
-        Vector3 playerStart = playerTransform.position;
-        Vector3 playerTarget = playerStart + new Vector3(1f, 0, 0);
-        yield return MoveOverTime(playerTransform, playerStart, playerTarget, moveDuration);
-
-        // 연출: 몬스터 오른쪽 바깥에서 등장
-        Vector3 monsterStart = monsterTransform.position + Vector3.right * 2.5f;
-        monsterTransform.position = monsterStart;
-        Vector3 monsterTarget = monsterStart + Vector3.left * 3.5f;
-        yield return MoveOverTime(monsterTransform, monsterStart, monsterTarget, moveDuration);
-
-        yield return new WaitForSeconds(0.5f);
-
-        // 연출: 배경 카메라 이동중지
-        parallaxBackground.Camera_Move = false;
-
-        //아래부터 전투
-        DecideFirstTurn();
-
+        yield return StartCoroutine(BattleIntro());
         yield return StartCoroutine(CombatLoop());
     }
 
-    //누가 먼저 싸울꺼냐!
-    private void DecideFirstTurn()
+    private IEnumerator BattleIntro()
     {
-        if (playerStats.Speed > monsterStats.Speed)
-        {
-            currentAttacker = playerStats;
-            currentDefender = monsterStats;
-        }
-        else if (playerStats.Speed < monsterStats.Speed)
-        {
-            currentAttacker = monsterStats;
-            currentDefender = playerStats;
-        }
-        else
-        {
-            // 속도가 같으면 랜덤으로 결정
-            if (Random.value < 0.5f)
-            {
-                currentAttacker = playerStats;
-                currentDefender = monsterStats;
-            }
-            else
-            {
-                currentAttacker = monsterStats;
-                currentDefender = playerStats;
-            }
-        }
-
-        battleLogUI.AddLog(currentAttacker.Name + "이(가) 먼저 공격합니다!");
+        Vector3 playerStart = playerTransform.position;
+        Vector3 playerTarget = playerStart + Vector3.left * 1f;
+        yield return MoveOverTime(playerTransform, playerStart, playerTarget, moveDuration);
+        yield return new WaitForSeconds(0.3f);
     }
 
     private IEnumerator CombatLoop()
     {
-        //누군가 죽을때까지 싸운다.
-        while (!playerStats.IsDead && !monsterStats.IsDead)
+        while (!playerStats.IsDead && monsterStatsList.Count > 0)
         {
-            //공격자가 공격횟수만큼 공격
-            for (int i = 0; i < currentAttacker.AttackCount; i++)
+            if (turnIndex == 0)
             {
-                currentDefender.TakeDamage(currentAttacker.Attack);
+                playerTurnCount++;
 
-                battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! adsfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfasdfsadfasdfasdfsadfsadfs");
-                //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
+                playerBuffs.ApplyTurnEffects(playerStats, battleLogUI);
+                ApplySkillEffectsOnTurnStart();
+                ApplySkillEffectsOnPlayerTurn();
 
-                //방어자 죽었는가 판별
-                if (currentDefender.IsDead) break;
-                yield return new WaitForSeconds(attackDelay);
+                stateUIManager.RefreshUI();
+
+                var target = monsterStatsList[0];
+                int totalHits = playerStats.AttackCount;
+
+                if (HasSkillChance("연타")) totalHits++;
+
+                for (int i = 0; i < totalHits; i++)
+                {
+                    target.TakeDamage(playerStats.Attack);
+                    battleLogUI.AddLog($"플레이어의 공격! {target.Name}에게 {playerStats.Attack} 피해!");
+
+                    if (HasSkillChance("흡혈"))
+                    {
+                        int healAmount = playerStats.Attack / 2;
+                        playerStats.Heal(healAmount);
+                        battleLogUI.AddLog($"[스킬] 흡혈 발동! 플레이어 HP {healAmount} 회복");
+                    }
+
+                    if (HasSkillChance("빙결"))
+                    {
+                        battleLogUI.AddLog($"[스킬] 얼음 가시 발동! {target.Name}에게 빙결 효과 적용됨!");
+                    }
+                }
+
+                stateUIManager.RefreshUI();
+
+                if (target.IsDead)
+                {
+                    battleLogUI.AddLog($"{target.Name} 사망!");
+                    monsterStatsList.RemoveAt(0);
+                    monsterBuffsList.RemoveAt(0);
+                }
+            }
+            else
+            {
+                int monsterIndex = turnIndex - 1;
+                if (monsterIndex < monsterStatsList.Count)
+                {
+                    var attacker = monsterStatsList[monsterIndex];
+                    var buff = monsterBuffsList[monsterIndex];
+
+                    buff.ApplyTurnEffects(attacker, battleLogUI);
+                    stateUIManager.RefreshUI();
+
+                    playerStats.TakeDamage(attacker.Attack);
+                    battleLogUI.AddLog($"{attacker.Name}의 공격! 플레이어에게 {attacker.Attack} 피해!");
+
+                    stateUIManager.RefreshUI();
+
+                    if (playerStats.IsDead)
+                    {
+                        battleLogUI.AddLog("플레이어 사망!");
+                        onBattleEndCallback?.Invoke(false);
+                        yield break;
+                    }
+                }
             }
 
-            //방어자가 죽었는가 판별
-            if (currentDefender.IsDead)
+            turnIndex++;
+            if (turnIndex > monsterStatsList.Count) turnIndex = 0;
+            yield return new WaitForSeconds(attackDelay);
+        }
+
+        battleLogUI.AddLog("모든 몬스터 처치 완료!");
+        onBattleEndCallback?.Invoke(true);
+    }
+
+    private void ApplySkillEffectsOnTurnStart()
+    {
+        foreach (var skill in playerSkills)
+        {
+            if (!CheckSkillCondition(skill)) continue;
+
+            if (skill.Name.Contains("턴마다 번개") && UnityEngine.Random.value < skill.Power / 100f)
             {
-
-                if (currentDefender == playerStats)
+                if (monsterStatsList.Count > 0)
                 {
-                    //Debug.Log("Player is dead");
-                    battleLogUI.AddLog("Player is dead");
-                    yield return new WaitForSeconds(1f);
-                    SceneManager.LoadScene(SceneName.RoomScene.ToString());
+                    var target = monsterStatsList[UnityEngine.Random.Range(0, monsterStatsList.Count)];
+                    target.TakeDamage(playerStats.Attack);
+                    battleLogUI.AddLog($"[스킬] {skill.Name} 발동! → {target.Name}에게 추가 번개 피해 {playerStats.Attack}");
                 }
-                else
-                {
-                    battleLogUI.AddLog("Monster is dead");
-                    //Debug.Log("Monster is dead");
-                    Destroy(monsterTransform.GetChild(0).gameObject, 1f);
-                }
-
-                yield return new WaitForSeconds(1f);
-
-                //배경 카메라 이동시작
-                parallaxBackground.Camera_Move = true;
-                yield break;
             }
 
-            // 턴 교체
-            (currentAttacker, currentDefender) = (currentDefender, currentAttacker);
-
-
-
-            yield return new WaitForSeconds(0.5f);
+            if (skill.Name.Contains("보호막") && UnityEngine.Random.value < skill.Power / 100f)
+            {
+                int shieldAmount = playerStats.Attack / 2;
+                playerStats.Heal(shieldAmount);
+                battleLogUI.AddLog($"[스킬] 보호막 획득! HP {shieldAmount} 보호막 효과");
+            }
         }
     }
 
-    //무빙 무빙 
+    private void ApplySkillEffectsOnPlayerTurn()
+    {
+        foreach (var skill in playerSkills)
+        {
+            if (!CheckSkillCondition(skill)) continue;
+
+            if (skill.Name.Contains("2턴마다") && playerTurnCount % 2 == 0)
+            {
+                playerStats.IncrementAttackCount(1);
+                battleLogUI.AddLog($"[스킬] {skill.Name} 발동 → 이번 턴 공격 횟수 +1");
+            }
+
+            if (skill.Name.Contains("3턴마다") && playerTurnCount % 3 == 0)
+            {
+                playerStats.IncrementAttackCount(1);
+                battleLogUI.AddLog($"[스킬] {skill.Name} 발동 → 이번 턴 공격 횟수 +1");
+            }
+        }
+    }
+
+    private bool HasSkillChance(string keyword)
+    {
+        foreach (var skill in playerSkills)
+        {
+            if (skill.Name.Contains(keyword) && CheckSkillCondition(skill))
+            {
+                if (UnityEngine.Random.value < skill.Power / 100f)
+                {
+                    battleLogUI.AddLog($"[스킬] {skill.Name} 효과 발동!");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private bool CheckSkillCondition(Skill skill)
+    {
+        if (skill.Name.Contains("빈사") && playerStats.CurrentHp < playerStats.MaxHp * 0.3f)
+            return true;
+
+        if (skill.Name.Contains("HP 50%") && playerStats.CurrentHp < playerStats.MaxHp * 0.5f)
+            return true;
+
+        if (skill.Name.Contains("전투 시작") && turnIndex == 0)
+            return true;
+
+        if (!skill.Name.Contains("빈사") && !skill.Name.Contains("전투 시작") && !skill.Name.Contains("HP 50%"))
+            return true;
+
+        return false;
+    }
+
     private IEnumerator MoveOverTime(Transform target, Vector3 from, Vector3 to, float duration)
     {
         float elapsed = 0f;
-
         while (elapsed < duration)
         {
             target.position = Vector3.Lerp(from, to, elapsed / duration);

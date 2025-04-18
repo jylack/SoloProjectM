@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7084866410486532751}
   - component: {fileID: 2669932309600287357}
   - component: {fileID: 6788998566433314434}
+  - component: {fileID: 5637374218740866063}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Untagged
@@ -27,9 +28,9 @@ Transform:
   m_GameObject: {fileID: 5859000150779324217}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5681207, y: 0.373, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -106,3 +107,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5637374218740866063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5859000150779324217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b24a075d9b2fbdb449c9eed075a7aa1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterSO: {fileID: 11400000, guid: 4dedf425af8d37341a46a6204841dc4e, type: 2}

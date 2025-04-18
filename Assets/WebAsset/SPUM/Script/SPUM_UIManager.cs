@@ -270,6 +270,8 @@ public class SPUM_UIManager : MonoBehaviour
     //     tName = tName + tNameNum.ToString("D3");
     //     return tName;
     // }
+
+
     void CloseToast()
     {
         isToastActive = false;

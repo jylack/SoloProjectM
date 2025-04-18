@@ -13,7 +13,8 @@ public class SPUM_AnimationControllerPanel : MonoBehaviour
     [SerializeField] Text ClipName;
     private SPUM_Prefabs previewUnit;
 
-    public void Init(SPUM_Prefabs unit){
+    public void Init(SPUM_Prefabs unit)
+    {
         previewUnit = unit;
         timeLineSlider.minValue = 0f;
         timeLineSlider.maxValue = 1f;
@@ -21,14 +22,16 @@ public class SPUM_AnimationControllerPanel : MonoBehaviour
 
         playSpeedSlider.minValue = 1;
         playSpeedSlider.maxValue = 200;
-        
+
         playSpeedSlider.wholeNumbers = true;
         playSpeedText = playSpeedSlider.transform.GetComponentInChildren<Text>();
-        
-        timeLineSlider.onValueChanged.AddListener( x => {
+
+        timeLineSlider.onValueChanged.AddListener(x =>
+        {
             SetAnimationNormailzedTime(x);
         });
-        playSpeedSlider.onValueChanged.AddListener( x => {
+        playSpeedSlider.onValueChanged.AddListener(x =>
+        {
             var AnimationSpeed = x * .01f;
             previewUnit._anim.speed = AnimationSpeed;
             playSpeedText.text = string.Format("Speed x{0:0.00}", AnimationSpeed);
@@ -38,19 +41,21 @@ public class SPUM_AnimationControllerPanel : MonoBehaviour
         });
         playSpeedSlider.value = 100f;
     }
-    public void RefreshSlier(string clipPath){
+    public void RefreshSlier(string clipPath)
+    {
         var Name = clipPath.Split("/");
-        var clip = Name[Name.Length-1].Replace(".anim","");
+        var clip = Name[Name.Length - 1].Replace(".anim", "");
         timeLineSlider.SetValueWithoutNotify(0f);
         playSpeedSlider.onValueChanged.Invoke(playSpeedSlider.value);
         ClipName.text = $"{clip} [{string.Format("{0:F2}", SetClipTime(1))}]";
     }
-    private float SetClipTime(float progress){
+    private float SetClipTime(float progress)
+    {
         var clipInfo = previewUnit._anim.GetCurrentAnimatorClipInfo(0);
         float clipLength = clipInfo[0].clip.length;
         var attackAnimationClipPlayTime = (clipLength / (playSpeedSlider.value * 0.01f)) * progress;
         return attackAnimationClipPlayTime;
-       
+
     }
     private void SetAnimationNormailzedTime(float progress)
     {
