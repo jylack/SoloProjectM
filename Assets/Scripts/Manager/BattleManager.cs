@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -52,8 +51,26 @@ public class BattleManager : MonoBehaviour
     private IEnumerator BattleIntro()
     {
         Vector3 playerStart = playerTransform.position;
-        Vector3 playerTarget = playerStart + Vector3.left * 1f;
+        Vector3 playerTarget = playerStart + Vector3.right;
         yield return MoveOverTime(playerTransform, playerStart, playerTarget, moveDuration);
+
+        var count = monsterStatsList.Count;
+
+        Vector3 monsterStart = monsterSpawnRoot.position;
+
+        Vector3 monsterTarget;
+
+
+        if (count > 1)
+        {
+            monsterTarget = monsterStart;
+        }
+        else
+        {
+            monsterTarget = monsterStart + Vector3.right;
+        }
+
+        yield return MoveOverTime(monsterSpawnRoot, monsterTarget, monsterTarget, moveDuration);
         yield return new WaitForSeconds(0.3f);
     }
 
@@ -98,7 +115,9 @@ public class BattleManager : MonoBehaviour
 
                 if (target.IsDead)
                 {
+                    Debug.Log("∏ÛΩ∫≈Õ ªÁ∏¡");
                     battleLogUI.AddLog($"{target.Name} ªÁ∏¡!");
+
                     monsterStatsList.RemoveAt(0);
                     monsterBuffsList.RemoveAt(0);
                 }
@@ -217,6 +236,7 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator MoveOverTime(Transform target, Vector3 from, Vector3 to, float duration)
     {
+
         float elapsed = 0f;
         while (elapsed < duration)
         {
@@ -224,6 +244,8 @@ public class BattleManager : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
         target.position = to;
+
     }
 }

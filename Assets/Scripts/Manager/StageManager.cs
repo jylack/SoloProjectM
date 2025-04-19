@@ -24,6 +24,7 @@ public class StageManager : MonoBehaviour
         {
             int rand = Random.Range(0, monsterPrefabs.Length);
             GameObject monster = Instantiate(monsterPrefabs[rand], monsterSpawnPoint);
+            //Debug.Log(monsterSpawnPoint.position);
             currentMonsters.Add(monster);
         }
 
@@ -36,13 +37,32 @@ public class StageManager : MonoBehaviour
 
         List<UnitStats> monsterStatsList = new List<UnitStats>();
 
-        foreach (var monsterGO in currentMonsters)
+        var count = currentMonsters.Count;
+        float temp = -1f;
+ 
+        if(count > 1)
         {
-            var monster = monsterGO.GetComponent<Monster>();
+            monsterSpawnPoint.position += Vector3.right;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            var monster = currentMonsters[i].GetComponent<Monster>();
+
             if (monster != null)
             {
+                if (i > 0)
+                {
+                    var x = monsterSpawnPoint.position.x + ((monster.gameObject.GetComponent<Renderer>().bounds.size.x / monster.transform.localScale.x) * temp);
+                    //Debug.Log(x);
+                    var y = monsterSpawnPoint.position.y;
+                    var z = monsterSpawnPoint.position.z;
+                    temp = temp * -1f;
+
+                    monster.gameObject.transform.position = new Vector3(x, y, z);
+                }
                 monsterStatsList.Add(monster.Stats);
-                logUI.AddLog("몬스터 등장! " + monster.Stats.Name);
+                logUI.AddLog( "["+ monster.Stats.Name + "] 몬스터 등장! ");
             }
         }
 

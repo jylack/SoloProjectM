@@ -19,7 +19,16 @@ public class SkillHudUI : MonoBehaviour
 
     public void ShowSkills(List<Skill> skillList)
     {
+        if(rootPanel.activeSelf == true)
+        {
+            rootPanel.SetActive(false);
+            return;
+        }
+        
+
         rootPanel.SetActive(true);
+        
+        Debug.Log(skillList.Count);
 
         for (int i = 0; i < slots.Length; i++)
         {

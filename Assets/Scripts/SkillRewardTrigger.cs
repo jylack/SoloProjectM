@@ -16,6 +16,9 @@ public class SkillRewardTrigger : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         var rewardList = SkillDB.GetRandomSkills(rewardCount);
+
+        yield return new WaitUntil(() => SkillRewardUI.Instance != null);
+        
         SkillRewardUI.Instance.Open(rewardList);
     }
 }

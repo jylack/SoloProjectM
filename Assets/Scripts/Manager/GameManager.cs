@@ -51,6 +51,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ShowOptionUI()
+    {
+        SkillHudUI.Instance.ShowSkills(PlayerSkills);
+    }
+
     // 룸씬에서 장비 기반으로 스탯 세팅 시 호출
     public void SetPlayerBaseStats(UnitStats newStats)
     {

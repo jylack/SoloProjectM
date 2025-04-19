@@ -14,6 +14,6 @@ public class Monster : MonoBehaviour
         _unitStats = monsterSO.Stats;
         //Debug.Log(_unitStats.Name);
     }
-
-
+    
+    
 }
