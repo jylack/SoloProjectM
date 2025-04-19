@@ -1,46 +1,51 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillHudUI : MonoBehaviour
 {
-    [SerializeField] private SkillSlotUI[] slots;
-    //옵션창열었을때 보여줄 패널
-    [SerializeField] private GameObject rootPanel;
-    //스테이지 내에서 일상적으로 보여질 패널
-    [SerializeField] private GameObject stagePanel;
+    [SerializeField] private Transform iconParent; // 아이콘을 배치할 부모
+    [SerializeField] private GameObject iconPrefab; // 아이콘 프리팹
 
-    public static SkillHudUI Instance;
+    private List<GameObject> spawnedIcons = new List<GameObject>();
 
-    private void Awake()
+    private void OnEnable()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        Refresh();
     }
 
-    public void ShowSkills(List<Skill> skillList)
+    public void Refresh()
     {
-        if(rootPanel.activeSelf == true)
+        // 기존 아이콘 제거
+        foreach (var icon in spawnedIcons)
         {
-            rootPanel.SetActive(false);
-            return;
+            Destroy(icon);
         }
-        
+        spawnedIcons.Clear();
 
-        rootPanel.SetActive(true);
-        
-        Debug.Log(skillList.Count);
-
-        for (int i = 0; i < slots.Length; i++)
+        // 플레이어 스킬 리스트 불러오기
+        var skills = GameManager.instance.PlayerCurrentSkills;
+        foreach (var skill in skills)
         {
-            if (i < skillList.Count)
-                slots[i].Set(skillList[i]);
-            else
-                slots[i].Clear();
-        }
-    }
+            GameObject icon = Instantiate(iconPrefab, iconParent);
+            Image iconImage = icon.GetComponent<Image>();
+            if (iconImage != null && skill.Icon != null)
+                iconImage.sprite = skill.Icon;
 
-    public void Hide()
-    {
-        rootPanel.SetActive(false);
+            // 툴팁 연결
+            var btn = icon.GetComponent<Button>();
+            if (btn != null)
+            {
+                string name = skill.Name;
+                string desc = skill.Description;
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() =>
+                {
+                    //SkillTooltipUI.Instance.Show(name, desc);
+                });
+            }
+
+            spawnedIcons.Add(icon);
+        }
     }
 }
