@@ -101,7 +101,7 @@ public class BattleManager : MonoBehaviour
             {
                 currentDefender.TakeDamage(currentAttacker.Attack);
 
-                battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! adsfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfasdfsadfasdfasdfsadfsadfs");
+                battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
                 //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
 
                 //방어자 죽었는가 판별
