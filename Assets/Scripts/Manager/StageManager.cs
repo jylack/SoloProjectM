@@ -11,6 +11,16 @@ public class StageManager : MonoBehaviour
 
     private List<GameObject> currentMonsters = new List<GameObject>();
 
+    public static StageManager Instance;
+    private void Awake()
+    {
+        if(Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+
+    }
+
     private void Start()
     {
         InitStage();
@@ -28,6 +38,16 @@ public class StageManager : MonoBehaviour
             currentMonsters.Add(monster);
         }
 
+        StartCoroutine(StartBattle());
+    }
+    public void InitStage(StageInfoSO stageInfo)
+    {
+        // 스테이지 정보에 따라 몬스터 생성
+        foreach (var monster in stageInfo.enemySet.possibleEnemies)
+        {
+            GameObject monsterObj = Instantiate(monster, monsterSpawnPoint);
+            currentMonsters.Add(monsterObj);
+        }
         StartCoroutine(StartBattle());
     }
 

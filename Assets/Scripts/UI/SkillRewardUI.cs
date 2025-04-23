@@ -18,7 +18,13 @@ public class SkillRewardUI : MonoBehaviour
         rootPanel.SetActive(false);
     }
 
-    public void Open(List<Skill> rewardList)
+    public void SetUp(RewardCondition reward)
+    {
+
+    }
+
+
+public void Open(List<Skill> rewardList)
     {
         rewards = rewardList;
         rootPanel.SetActive(true);

@@ -9,6 +9,16 @@ public class LogUI : MonoBehaviour
     [SerializeField] private GameObject logTextPrefab;  // 프리팹 (TMP_Text)
     [SerializeField] private ScrollRect scrollRect;     // ScrollView의 ScrollRect
 
+    public static LogUI Instance; // 싱글톤 인스턴스
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+
     //스테이지 시작 날짜 로그
     public void AddDayLog(int day, string message)
     {
