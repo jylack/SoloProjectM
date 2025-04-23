@@ -88,7 +88,7 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        battleLogUI.AddLog(currentAttacker.Name + "이(가) 먼저 공격합니다!");
+        //battleLogUI.AddLog(currentAttacker.Name + "이(가) 먼저 공격합니다!");
     }
 
     private IEnumerator CombatLoop()
@@ -101,7 +101,7 @@ public class BattleManager : MonoBehaviour
             {
                 currentDefender.TakeDamage(currentAttacker.Attack);
 
-                battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
+               // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
                 //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
 
                 //방어자 죽었는가 판별
@@ -116,13 +116,13 @@ public class BattleManager : MonoBehaviour
                 if (currentDefender == playerStats)
                 {
                     //Debug.Log("Player is dead");
-                    battleLogUI.AddLog("Player is dead");
+                    battleLogUI.AddLog("YOU DIE");
                     yield return new WaitForSeconds(1f);
                     SceneManager.LoadScene(SceneName.RoomScene.ToString());
                 }
                 else
                 {
-                    battleLogUI.AddLog("Monster is dead");
+                    battleLogUI.AddLog(currentDefender.Name + "를 처치했다!");
                     //Debug.Log("Monster is dead");
                     Destroy(monsterTransform.GetChild(0).gameObject, 1f);
                 }
