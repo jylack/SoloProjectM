@@ -10,7 +10,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private LogUI battleLogUI;
 
     [SerializeField] private Transform playerTransform;
+    Player player;
+
     [SerializeField] private Transform monsterTransform;
+    Monster monster;
 
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private float attackDelay = 0.5f;
@@ -25,16 +28,20 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        playerStats = playerTransform.GetComponent<Player>().stats;
-        monsterStats = monsterTransform.GetComponent<Monster>().Stats;
+        player = playerTransform.GetComponent<Player>();
+        playerStats = player.GetStats();
+        monster = monsterTransform.GetComponent<Monster>();
+        monsterStats = monster.GetStats();
 
+        player.SetAnim(PlayerState.MOVE);
+        monster.SetAnim(MonsterState.MOVE);
 
         StartCoroutine(StartBattle());
     }
 
     private IEnumerator StartBattle()
     {
-        yield return new WaitUntil(()=> GameManager.instance != null); // 전투 시작 대기
+        yield return new WaitUntil(() => GameManager.instance != null); // 전투 시작 대기
         battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
 
 
@@ -53,6 +60,7 @@ public class BattleManager : MonoBehaviour
 
         // 연출: 배경 카메라 이동중지
         parallaxBackground.Camera_Move = false;
+        player.SetAnim(PlayerState.IDLE);
 
         //아래부터 전투
         DecideFirstTurn();
@@ -99,9 +107,29 @@ public class BattleManager : MonoBehaviour
             //공격자가 공격횟수만큼 공격
             for (int i = 0; i < currentAttacker.AttackCount; i++)
             {
+
+                if (currentAttacker == playerStats)
+                {
+                    player.SetAnim(PlayerState.ATTACK);
+                }
+                else if (currentAttacker == monsterStats)
+                {
+                    monster.SetAnim(MonsterState.ATK1);
+                }
+
+                if (currentDefender == playerStats)
+                {
+                    player.SetAnim(PlayerState.DAMAGED);
+                }
+                else if (currentDefender == monsterStats)
+                {
+                    monster.SetAnim(MonsterState.DAMAGE);
+                }
+
                 currentDefender.TakeDamage(currentAttacker.Attack);
 
-               // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
+
+                // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
                 //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
 
                 //방어자 죽었는가 판별
@@ -115,6 +143,7 @@ public class BattleManager : MonoBehaviour
 
                 if (currentDefender == playerStats)
                 {
+                    player.SetAnim(PlayerState.DEATH);
                     //Debug.Log("Player is dead");
                     battleLogUI.AddLog("YOU DIE");
                     yield return new WaitForSeconds(1f);
@@ -122,7 +151,9 @@ public class BattleManager : MonoBehaviour
                 }
                 else
                 {
+                    monster.SetAnim(MonsterState.DEATH);
                     battleLogUI.AddLog(currentDefender.Name + "를 처치했다!");
+                    player.SetAnim(PlayerState.MOVE);
                     //Debug.Log("Monster is dead");
                     Destroy(monsterTransform.GetChild(0).gameObject, 1f);
                 }

@@ -34,6 +34,17 @@ public class SPUM_Prefabs : MonoBehaviour
     public List<AnimationClip> DEBUFF_List = new();
     public List<AnimationClip> DEATH_List = new();
     public List<AnimationClip> OTHER_List = new();
+
+    private void Awake()
+    {
+        // 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
+        PopulateAnimationLists();
+
+        // 2) AnimatorOverrideController를 생성해서 
+        //    기존 런타임 컨트롤러의 각 클립을 복제(override)해 둡니다
+        OverrideControllerInit();
+    }
+
     public void OverrideControllerInit()
     {
         Animator animator = _anim;

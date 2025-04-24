@@ -16,7 +16,37 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 568b33b8e9736f64ebc6c3a0b9e183c7
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 93dc4a4f8dcd4e54e8caef36f31069c1
+    m_Address: Assets/Animation/Goblin/Hit.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e92462d82f5d0e24eb61baac0a2a7a53
+    m_Address: Assets/Animation/Goblin/Run.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9ad3608a9331cd458d816b5a2678742
+    m_Address: Assets/Animation/Goblin/Idle.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e69e132349be2144b806c9c1f61531b4
+    m_Address: Assets/Animation/Goblin/Death.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 609a1f6ce389c92458c8bc59fa5684ce
+    m_Address: Assets/Animation/Goblin/Atk2.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a1190318b3c64f4e8fbd70d2bc69ed9
+    m_Address: Assets/Animation/Goblin/Atk1.anim
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 3c0a5339b23388244b0c629abc282df8, type: 2}
   m_SchemaSet:
