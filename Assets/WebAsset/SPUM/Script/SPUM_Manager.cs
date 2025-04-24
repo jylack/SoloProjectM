@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,10 +10,10 @@ using System.Linq;
 using System;
 using System.Globalization;
 #if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
 #endif
 [Serializable]
-public class SPUM_Animator{
+public class SPUM_Animator
+{
     public string Type;
     public RuntimeAnimatorController RuntimeAnimator;
 }
@@ -26,13 +25,13 @@ public class SPUM_Manager : MonoBehaviour
     public bool isSaveSamePath = false;
     public SPUM_Prefabs EditPrefab;
     public SPUM_Prefabs PreviewPrefab; // 프리뷰 프리펩
-    public SPUM_Animator[] SPUM_Animator; 
+    public SPUM_Animator[] SPUM_Animator;
     public Dictionary<string, RuntimeAnimatorController> SPUM_AnimatorDic = new();
     public Toggle RandomColorButton;
     //public List<SPUM_PackageButton> _packageButtonList = new List<SPUM_PackageButton>(); // 스펌 생성된 패키지 버튼 리스트
     //public Dictionary<string, bool> SpritePackagesFilterList = new Dictionary<string, bool>(); //보여질 패키지 상태 관리
     public List<SpumPackage> spumPackages;
-    public List<string> StateList = new ();
+    public List<string> StateList = new();
     public List<string> UnitTypeList = new();
     public List<string> SpritePackageNameList = new();
     [Header("Manager")]
@@ -41,15 +40,16 @@ public class SPUM_Manager : MonoBehaviour
     [SerializeField] public SPUM_PaginationManager paginationManager;
 
 #if UNITY_EDITOR
-#region Unity Function
+    #region Unity Function
     void Awake()
     {
-        SoonsoonData.Instance._spumManager= this;
+        SoonsoonData.Instance._spumManager = this;
         LoadPackages();
         var unit = PreviewPrefab;
-        if(unit.spumPackages.Count.Equals(0)) {
+        if (unit.spumPackages.Count.Equals(0))
+        {
             var InitLegacyData = GetSpumLegacyData();
-            if(string.IsNullOrEmpty(unit.UnitType)) unit.UnitType = "Unit";
+            if (string.IsNullOrEmpty(unit.UnitType)) unit.UnitType = "Unit";
             unit.spumPackages = InitLegacyData;
         }
         var uniqueTypes = spumPackages
@@ -75,20 +75,21 @@ public class SPUM_Manager : MonoBehaviour
     }
     void Start()
     {
-       
+
         SPUM_AnimatorDic = SPUM_Animator.ToDictionary(item => item.Type, item => item.RuntimeAnimator);
-        
+
         StartCoroutine(StartProcess());
         SetType("Unit");
         ItemResetAll();
     }
     [ContextMenu("Setup")]
-    public void Setup(){
+    public void Setup()
+    {
         SetDefultSet("Unit", "Body", "Human_1", Color.white);
-        SetDefultSet("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255));
+        SetDefultSet("Unit", "Eye", "Eye0", new Color32(71, 26, 26, 255));
         SetDefultSet("Horse", "Body", "Horse1", Color.white);
     }
-#endregion
+    #endregion
 
 
     // public void SetPackageActiveStateList(){{
@@ -101,7 +102,7 @@ public class SPUM_Manager : MonoBehaviour
 
         // 버전 체크 및 패키지 데이터 체크
         yield return StartCoroutine(SoonsoonData.Instance.LoadData());
-        
+
 
         // bool dirChk = Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Items");
         // if(!dirChk)
@@ -118,10 +119,10 @@ public class SPUM_Manager : MonoBehaviour
 
 
         // 작업 색상 정보 로드
-        if( SoonsoonData.Instance._soonData2._savedColorList == null ||  SoonsoonData.Instance._soonData2._savedColorList.Count.Equals(0))
+        if (SoonsoonData.Instance._soonData2._savedColorList == null || SoonsoonData.Instance._soonData2._savedColorList.Count.Equals(0))
         {
             SoonsoonData.Instance._soonData2._savedColorList = new List<string>();
-            for(var i = 0 ; i < 17 ;i++)
+            for (var i = 0; i < 17; i++)
             {
                 SoonsoonData.Instance._soonData2._savedColorList.Add("");
             }
@@ -130,16 +131,19 @@ public class SPUM_Manager : MonoBehaviour
         else
         {
             //Debug.Log( SoonsoonData.Instance._soonData2._savedColorList.Count);
-            for(var i = 0 ; i < SoonsoonData.Instance._soonData2._savedColorList.Count ;i++)
+            for (var i = 0; i < SoonsoonData.Instance._soonData2._savedColorList.Count; i++)
             {
                 string tSTR = SoonsoonData.Instance._soonData2._savedColorList[i];
                 //Debug.Log(tSTR);
                 Color parsedColor;
-                if(ColorUtility.TryParseHtmlString(tSTR, out parsedColor)){
+                if (ColorUtility.TryParseHtmlString(tSTR, out parsedColor))
+                {
                     UIManager._colorSaveList[i]._savedColor.gameObject.SetActive(true);
                     UIManager._colorSaveList[i]._savedColor.color = parsedColor;
-                }else{
-                    if(string.IsNullOrWhiteSpace(tSTR)) continue;
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(tSTR)) continue;
                     Debug.LogWarning(tSTR + " is Invalid color information");
                 }
             }
@@ -153,8 +157,8 @@ public class SPUM_Manager : MonoBehaviour
         //Debug.Log("Index" + jsonFileArray.Length);
         foreach (var asset in jsonFileArray)
         {
-            if(!asset.name.Contains("Index")) continue;
-            if(!asset) continue;
+            if (!asset.name.Contains("Index")) continue;
+            if (!asset) continue;
             Debug.Log(asset);
             var Package = JsonUtility.FromJson<SpumPackage>(asset.ToString());
             spumPackages.Add(Package);
@@ -162,15 +166,18 @@ public class SPUM_Manager : MonoBehaviour
         var dataSortList = spumPackages.OrderBy(p => DateTime.ParseExact(p.CreationDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)).ToList();
         spumPackages = dataSortList;
     }
-    public List<SpumPackage> GetSpumPackageData(){
+    public List<SpumPackage> GetSpumPackageData()
+    {
         return spumPackages;
     }
-    public List<SpumPackage> GetSpumLegacyData(){
+    public List<SpumPackage> GetSpumLegacyData()
+    {
         string targetString = "Legacy";
         var LegacyData = spumPackages;
         foreach (var package in LegacyData)
         {
-            if(package.Name.Equals(targetString)) {
+            if (package.Name.Equals(targetString))
+            {
                 foreach (var data in package.SpumAnimationData)
                 {
                     data.HasData = true;
@@ -179,21 +186,21 @@ public class SPUM_Manager : MonoBehaviour
         }
         return LegacyData; // Package;
     }
-#region PreviewItemPanel
+    #region PreviewItemPanel
     public void DrawItemList(SPUM_SpriteButtonST ButtonData)
     {
         UIManager.SetPackageButtons(ButtonData);
-        
-        var enabledPackages =  UIManager.SpritePackagesFilterList
+
+        var enabledPackages = UIManager.SpritePackagesFilterList
             .Where(kvp => kvp.Value)
             .Select(kvp => kvp.Key)
             .ToList();
-        
+
         UIManager._panelTitle.text = ButtonData.PartType;
 
         UIManager.ClearPreviewItems();
 
-        var SpumPackages =  spumPackages;
+        var SpumPackages = spumPackages;
 
         string unitType = ButtonData.UnitType;
         string partType = ButtonData.PartType;
@@ -204,17 +211,17 @@ public class SPUM_Manager : MonoBehaviour
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(partType) && x.Texture.UnitType.Equals(unitType))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 구룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
-        
+
         // 필터된 패키지 아이템 순환
-        foreach (var package in groupedPackageData) 
+        foreach (var package in groupedPackageData)
         {
-            
+
             // 프리뷰 아이템 버튼 생성
             var PreviewItem = UIManager.CreatePreviewItem();
             var previewButton = PreviewItem.GetComponent<SPUM_PreviewItem>();
@@ -224,13 +231,13 @@ public class SPUM_Manager : MonoBehaviour
             {
                 tr.gameObject.SetActive(tr.name.ToUpper() == ButtonData.ItemShowType.ToUpper());
             }
-            previewButton.SetSpriteButton.onClick.AddListener(()=> { ButtonData.IsActive = true; } );
+            previewButton.SetSpriteButton.onClick.AddListener(() => { ButtonData.IsActive = true; });
 
             //Preview Element Matching Map
-            var UnitPartLists = previewButton.GetComponentsInChildren<SPUM_PreviewMatchingList>(); 
+            var UnitPartLists = previewButton.GetComponentsInChildren<SPUM_PreviewMatchingList>();
 
             // 보여질 이미지 추출
-            var UnitPartList = UnitPartLists 
+            var UnitPartList = UnitPartLists
                 .SelectMany(table => table.matchingTables)
                 .Where(element => element.PartType == package.Key.PartType && element.UnitType == package.Key.UnitType)
                 .ToList();
@@ -240,7 +247,8 @@ public class SPUM_Manager : MonoBehaviour
                 //Debug.Log($"  Package: {item.Package.Name}, SubType: {item.Texture.SubType}, Path: {item.Texture.Path}");
                 foreach (var part in UnitPartList)
                 {
-                    if(part.Structure == item.Texture.SubType){ // 멀티플 타입 이미지 인 경우
+                    if (part.Structure == item.Texture.SubType)
+                    { // 멀티플 타입 이미지 인 경우
                         var LoadSprite = LoadSpriteFromMultiple(item.Texture.Path, item.Texture.SubType);
                         part.ItemPath = item.Texture.Path;
                         part.image.sprite = LoadSprite;
@@ -259,7 +267,7 @@ public class SPUM_Manager : MonoBehaviour
                         part.MaskIndex = (int)ButtonData.SpriteMask;
                         previewButton.ImageElement.Add(part);
                     }
-                    else if(UnitPartList.Count == 1) // 서브타입이 없는 멀티플이 아닌경우 
+                    else if (UnitPartList.Count == 1) // 서브타입이 없는 멀티플이 아닌경우 
                     {
                         var LoadSprite = LoadSpriteFromMultiple(item.Texture.Path, item.Texture.SubType);
                         part.ItemPath = item.Texture.Path;
@@ -284,7 +292,7 @@ public class SPUM_Manager : MonoBehaviour
             }
             previewButton.ImageElement = previewButton.ImageElement.Distinct().ToList();
             // 필요없는 항목 비활성화
-            UnitPartList.ForEach(item => 
+            UnitPartList.ForEach(item =>
             {
                 item.image.gameObject.SetActive(item.image.sprite != null);
             });
@@ -294,10 +302,11 @@ public class SPUM_Manager : MonoBehaviour
         // 프리뷰 아이템 데이터를 적용 필요
         UIManager.ShowItem();
     }
-#endregion
+    #endregion
 
-#region PreviewUnit
-    public void SetType(string Type){
+    #region PreviewUnit
+    public void SetType(string Type)
+    {
         var PreviewUnit = PreviewPrefab;
         PreviewUnit.UnitType = Type;
         foreach (Transform child in PreviewUnit.transform)
@@ -307,27 +316,29 @@ public class SPUM_Manager : MonoBehaviour
         var anim = PreviewUnit.GetComponentInChildren<Animator>();
         PreviewPrefab._anim = anim;
 
-        if(Type.Equals("Unit"))
+        if (Type.Equals("Unit"))
         {
             var ElementList = PreviewUnit.ImageElement;
             ElementList.RemoveAll(element => element.UnitType != Type);
-        }else{
-            SetDefultSet(Type, "Body", Type+"1", Color.white);
         }
-        
+        else
+        {
+            SetDefultSet(Type, "Body", Type + "1", Color.white);
+        }
+
     }
     public void SetDefultSet(string UnitType, string PartType, string TextureName, Color color)
     {
-        string PackageName ="Legacy";
+        string PackageName = "Legacy";
         //패키지 구룹화
         var groupedData = spumPackages
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
 
@@ -363,39 +374,39 @@ public class SPUM_Manager : MonoBehaviour
         //Debug.Log(ImageElement.Count + "SetSpriteCount" + allMatchingElements.Count());
         foreach (var matchingElement in allMatchingElements)
         {
-            var matchingTypeElement = ImageElement.FirstOrDefault(ie => 
+            var matchingTypeElement = ImageElement.FirstOrDefault(ie =>
             (ie.UnitType == matchingElement.UnitType)
             && ("Weapons" == matchingElement.PartType)
             //&& ie.Index == matchingElement.Index
-            && (ie.Dir == matchingElement.Dir) 
+            && (ie.Dir == matchingElement.Dir)
             && (ie.Structure == matchingElement.Structure)
             );
             //Debug.Log(matchingTypeElement != null);
             if (matchingTypeElement != null)
             {
                 matchingElement.renderer.sprite = null;
-                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction) matchingTypeElement.MaskIndex;
+                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
                 matchingElement.renderer.color = matchingTypeElement.Color;
                 matchingElement.ItemPath = "";
                 matchingElement.Color = matchingTypeElement.Color;
             }
         }
-        #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
-        #else
-            #pragma warning disable CS0618
-            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
-            #pragma warning restore CS0618
-        #endif
+#else
+#pragma warning disable CS0618
+        var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+#pragma warning restore CS0618
+#endif
 
         foreach (var matchingElement in allMatchingElements)
         {
-            var matchingTypeElement = ImageElement.FirstOrDefault(ie => 
+            var matchingTypeElement = ImageElement.FirstOrDefault(ie =>
             (ie.UnitType == matchingElement.UnitType)
             && (ie.PartType == matchingElement.PartType)
             //&& ie.Index == matchingElement.Index
-            && (ie.Dir == matchingElement.Dir) 
-            && (ie.Structure == matchingElement.Structure) 
+            && (ie.Dir == matchingElement.Dir)
+            && (ie.Structure == matchingElement.Structure)
             && (ie.PartSubType == matchingElement.PartSubType)
             //&& !string.IsNullOrEmpty( matchingElement.PartSubType )
             );
@@ -403,13 +414,13 @@ public class SPUM_Manager : MonoBehaviour
             if (matchingTypeElement != null)
             {
                 var existingElement = ItemButtons.FirstOrDefault(e => e.PartType == matchingTypeElement.PartType);
-                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath , matchingTypeElement.Structure);
+                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath, matchingTypeElement.Structure);
                 matchingElement.renderer.sprite = LoadSprite;
-                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction) matchingTypeElement.MaskIndex;
+                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
                 Color PartColor = existingElement.ignoreColorPart.Contains(matchingTypeElement.PartType) ? Color.white : matchingTypeElement.Color;
                 matchingElement.renderer.color = PartColor;
                 matchingElement.ItemPath = matchingTypeElement.ItemPath;
-                matchingElement.Color =  PartColor;
+                matchingElement.Color = PartColor;
             }
         }
         UIManager.DrawItemOff();
@@ -421,7 +432,7 @@ public class SPUM_Manager : MonoBehaviour
         var UnitType = ButtonData.UnitType;
         var PartType = ButtonData.PartType;
 
-        if(isSpriteFixed) return;
+        if (isSpriteFixed) return;
         string unitType = UnitType;
         string partType = PartType;
 
@@ -430,15 +441,15 @@ public class SPUM_Manager : MonoBehaviour
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(partType) && x.Texture.UnitType.Equals(unitType))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 구룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
-        int randomValue = UnityEngine.Random.Range(0, groupedData.Count+1);
+        int randomValue = UnityEngine.Random.Range(0, groupedData.Count + 1);
 
-        if(randomValue.Equals(groupedData.Count)) 
+        if (randomValue.Equals(groupedData.Count))
         {
             ButtonData.RemoveSprite();
             return;
@@ -472,7 +483,7 @@ public class SPUM_Manager : MonoBehaviour
         var PartType = ButtonData.PartType;
         var PackageName = ButtonData.DefaultPackageName;
         var TextureName = ButtonData.DefaultTextureName;
-        if(isSpriteFixed) return;
+        if (isSpriteFixed) return;
         IsActive = true;
         ButtonData.PartSpriteColor = ButtonData.InitColor;
         //Debug.Log(ButtonData.PartType + " " +  ButtonData.InitColor);
@@ -481,10 +492,10 @@ public class SPUM_Manager : MonoBehaviour
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
         //Debug.Log($"UnitType: {UnitType}, PartType: { PartType}, PackageName: { PackageName}, TextureName: { TextureName} / {groupedData.Count}");
@@ -499,10 +510,10 @@ public class SPUM_Manager : MonoBehaviour
             part.PartSubType = item.Texture.PartSubType;
             part.Dir = ButtonData.Direction;
             part.ItemPath = item.Texture.Path;
-            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;  
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;
             part.MaskIndex = 0;
             //part.Color = ButtonData.InitColor;
-            
+
             Color PartColor = ButtonData.ignoreColorPart.Contains(item.Texture.SubType) ? Color.white : ButtonData.InitColor;
             part.Color = PartColor;
 
@@ -518,13 +529,13 @@ public class SPUM_Manager : MonoBehaviour
         var UnitType = ButtonData.UnitType;
         var PartType = ButtonData.PartType;
 
-        if(isSpriteFixed) return;
+        if (isSpriteFixed) return;
         ButtonData.IsActive = false;
         ButtonData.PartSpriteColor = ButtonData.InitColor;
         var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
 
         var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
-            .Where(element => 
+            .Where(element =>
                 element.UnitType == UnitType &&
                 element.PartType == PartType &&
                 element.Dir == ButtonData.Direction
@@ -557,11 +568,11 @@ public class SPUM_Manager : MonoBehaviour
         var UnitType = ButtonData.UnitType;
         var PartType = ButtonData.PartType;
 
-        if(isSpriteFixed) return;
+        if (isSpriteFixed) return;
         var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
 
         var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
-            .Where(element => 
+            .Where(element =>
                 element.UnitType == UnitType &&
                 element.PartType == PartType &&
                 element.Dir == ButtonData.Direction
@@ -574,7 +585,7 @@ public class SPUM_Manager : MonoBehaviour
             part.UnitType = UnitType;
             part.PartType = PartType;
             part.Dir = matchingElement.Dir;
-            part.Structure = matchingElement.Structure;  
+            part.Structure = matchingElement.Structure;
             Color PartColor = ButtonData.ignoreColorPart.Contains(matchingElement.Structure) ? Color.white : ButtonData.PartSpriteColor;
             part.Color = PartColor;
             matchingElement.Color = PartColor;
@@ -595,7 +606,7 @@ public class SPUM_Manager : MonoBehaviour
         var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
 
         var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
-            .Where(element => 
+            .Where(element =>
                 element.UnitType == UnitType &&
                 element.PartType == PartType &&
                 element.Dir == ButtonData.Direction
@@ -608,7 +619,7 @@ public class SPUM_Manager : MonoBehaviour
             part.UnitType = UnitType;
             part.PartType = PartType;
             part.Dir = matchingElement.Dir;
-            part.Structure = matchingElement.Structure;  
+            part.Structure = matchingElement.Structure;
             part.MaskIndex = (int)ButtonData.SpriteMask;
             ListElement.Add(part);
         }
@@ -616,14 +627,14 @@ public class SPUM_Manager : MonoBehaviour
     }
     public void ItemRandomAll()
     {
-        #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
-        #else
-            #pragma warning disable CS0618
-            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
-            #pragma warning restore CS0618
-        #endif
-        List<string> conditionTypes = new List<string> {"Body", "Horse" };
+#else
+#pragma warning disable CS0618
+        var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+#pragma warning restore CS0618
+#endif
+        List<string> conditionTypes = new List<string> { "Body", "Horse" };
 
         var filteredButtons = ItemButtons.Where(button => !conditionTypes.Contains(button.ItemShowType)).ToList();
         foreach (var button in filteredButtons)
@@ -634,33 +645,34 @@ public class SPUM_Manager : MonoBehaviour
     public void ItemResetAll()
     {
         //Debug.Log("ItemResetAll");
-        #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
-        #else
-            #pragma warning disable CS0618
-            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
-            #pragma warning restore CS0618
-        #endif
+#else
+#pragma warning disable CS0618
+        var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+#pragma warning restore CS0618
+#endif
         foreach (var button in ItemButtons)
         {
             button.RemoveSprite();
         }
-        
+
         ResetBody();
     }
     public void ResetBody()
     {
         SetType(PreviewPrefab.UnitType);
 
-        #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
-        #else
-            #pragma warning disable CS0618
-            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
-            #pragma warning restore CS0618
-        #endif
-        List<string> conditionTypes = new List<string> { "Eye" , "Body" };
-        if(PreviewPrefab.UnitType.Equals("Horse")){
+#else
+#pragma warning disable CS0618
+        var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+#pragma warning restore CS0618
+#endif
+        List<string> conditionTypes = new List<string> { "Eye", "Body" };
+        if (PreviewPrefab.UnitType.Equals("Horse"))
+        {
             conditionTypes.Add("Horse");
         }
         var filteredButtons = ItemButtons.Where(button => conditionTypes.Contains(button.ItemShowType)).ToList();
@@ -677,18 +689,18 @@ public class SPUM_Manager : MonoBehaviour
         var partTypeUnitTypeColorDict = ImageElement
                                             .GroupBy(m => new { m.PartType, m.UnitType, m.Dir })
                                             .ToDictionary(g => g.Key, g => g.First().Color);
-        #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
-        #else
-            #pragma warning disable CS0618
-            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
-            #pragma warning restore CS0618
-        #endif
+#else
+#pragma warning disable CS0618
+        var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+#pragma warning restore CS0618
+#endif
 
         foreach (var button in ItemButtons)
         {
             var key = new { PartType = button.ItemShowType, UnitType = button.UnitType, Dir = button.Direction };
-            
+
             if (partTypeUnitTypeColorDict.ContainsKey(key))
             {
                 button.IsActive = true;
@@ -700,21 +712,25 @@ public class SPUM_Manager : MonoBehaviour
             }
         }
     }
-    
-    public void SetPrefabToPreviewPackageData(List<SpumPackage> packages){
-        if(packages.Count.Equals(0)){
+
+    public void SetPrefabToPreviewPackageData(List<SpumPackage> packages)
+    {
+        if (packages.Count.Equals(0))
+        {
             PreviewPrefab.spumPackages = GetSpumLegacyData();
-        }else{
+        }
+        else
+        {
             PreviewPrefab.spumPackages = packages;
         }
         // 패키지 체크
-        Debug.Log($"Prefab Package { packages.Count } / Total Package { spumPackages.Count }");
+        Debug.Log($"Prefab Package {packages.Count} / Total Package {spumPackages.Count}");
         animationManager.PlayFirstAnimation();
     }
-    
-#endregion
-    
-#region ElementData
+
+    #endregion
+
+    #region ElementData
     private bool AreElementsEqual(PreviewMatchingElement element1, PreviewMatchingElement element2)
     {
         return element1.UnitType == element2.UnitType &&
@@ -758,7 +774,7 @@ public class SPUM_Manager : MonoBehaviour
     }
     public void SetElementColorData(List<PreviewMatchingElement> ElementList)
     {
-         var PreviewUnit = PreviewPrefab;
+        var PreviewUnit = PreviewPrefab;
         foreach (var newElement in ElementList)
         {
             var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
@@ -773,7 +789,7 @@ public class SPUM_Manager : MonoBehaviour
     }
     public void SetElementMaskData(List<PreviewMatchingElement> ElementList)
     {
-         var PreviewUnit = PreviewPrefab;
+        var PreviewUnit = PreviewPrefab;
         foreach (var newElement in ElementList)
         {
             var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
@@ -787,9 +803,9 @@ public class SPUM_Manager : MonoBehaviour
         }
     }
 
-#endregion
+    #endregion
 
-#region Prefab
+    #region Prefab
 
 
     //프리팹 저장 부분
@@ -801,7 +817,7 @@ public class SPUM_Manager : MonoBehaviour
 
         SpumPreviewUnit._code = prefabName;
         //SpumPreviewUnit.EditChk = false;
-        
+
         GameObject prefabs = Instantiate(SpumPreviewUnit.gameObject);
         SPUM_Prefabs SpumUnitData = prefabs.GetComponent<SPUM_Prefabs>();
         SpumUnitData.ImageElement = SpumPreviewUnit.ImageElement;
@@ -813,7 +829,7 @@ public class SPUM_Manager : MonoBehaviour
             .ToList();
 
         inactiveObjects.ForEach(DestroyImmediate);
-        
+
         prefabs.transform.localScale = Vector3.one;
         SpumUnitData._anim = prefabs.GetComponentInChildren<Animator>();
         SpumUnitData._anim.runtimeAnimatorController = SPUM_AnimatorDic[SpumPreviewUnit.UnitType];
@@ -824,10 +840,10 @@ public class SPUM_Manager : MonoBehaviour
             Directory.CreateDirectory(unitPath);
             AssetDatabase.Refresh();
             Debug.Log("Folder created at: " + unitPath);
-        }  
-        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,unitPath+prefabName+".prefab");
+        }
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs, unitPath + prefabName + ".prefab");
         DestroyImmediate(prefabs);
-        
+
         UIManager.ToastOn("Saved Unit Object " + prefabName);
         //초기화
         var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
@@ -873,14 +889,14 @@ public class SPUM_Manager : MonoBehaviour
 
         var sourcePath = AssetDatabase.GetAssetPath(EditPrefab);
         Debug.Log(sourcePath);
-        if(string.IsNullOrWhiteSpace(sourcePath)) 
+        if (string.IsNullOrWhiteSpace(sourcePath))
         {
-            sourcePath = Path.Combine(unitPath,SpumUnitData._code );
+            sourcePath = Path.Combine(unitPath, SpumUnitData._code);
         }
         var FileName = sourcePath.Split("/");
-        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length-1], "") : unitPath;
+        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length - 1], "") : unitPath;
         SpumUnitData.PopulateAnimationLists();
-        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,path+SpumUnitData._code+".prefab");
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs, path + SpumUnitData._code + ".prefab");
         // //GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset( prefabs, unitPath + prefabCode + ".prefab" );
         // var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
         // Prefab.PopulateAnimationLists();
@@ -923,7 +939,7 @@ public class SPUM_Manager : MonoBehaviour
     public void SetUnitConverter(string Type)
     {
         int UnitBodyCount = DebugList.Count(element => element.PartType == "Body");
-        if(UnitBodyCount < 6)
+        if (UnitBodyCount < 6)
         {
             DebugList.AddRange(DefaultData("Unit", "Body", "Human_1", Color.white));
         }
@@ -931,21 +947,23 @@ public class SPUM_Manager : MonoBehaviour
         //Debug.Log("UnitBodyCount " + UnitBodyCount);
         int UnitEyeCount = DebugList.Count(element => element.PartType == "Eye");
         UIManager.ConvertView.WarningEyeText.SetActive(UnitEyeCount < 2);
-        if(UnitEyeCount < 2){
-            DebugList.AddRange(DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255)));
+        if (UnitEyeCount < 2)
+        {
+            DebugList.AddRange(DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26, 26, 255)));
         }
         var DistinctPackageList = MissingPackageNames.Distinct().ToList();
         MissingPackageNames = DistinctPackageList;
 
         UIManager.ConvertView.MissingPackageNames.transform.parent.gameObject.SetActive(MissingPackageNames.Count > 0);
-        if(MissingPackageNames.Count > 0){
+        if (MissingPackageNames.Count > 0)
+        {
             string Text = "";
             foreach (var item in MissingPackageNames)
             {
-                Text += "\n-" + item ;
+                Text += "\n-" + item;
             }
-           
-            string format = $"Missing\nPackages\n--------------{ Text }";
+
+            string format = $"Missing\nPackages\n--------------{Text}";
             UIManager.ConvertView.MissingPackageNames.text = format;
         }
         var containUnitTypes = DebugList
@@ -953,7 +971,7 @@ public class SPUM_Manager : MonoBehaviour
         .Distinct()
         .ToList();
         bool shouldActivate = containUnitTypes.Any(unitType => unitType.Contains("Horse"));
-        if(shouldActivate) Type = "Horse";
+        if (shouldActivate) Type = "Horse";
         previewUnit.UnitType = Type;
         foreach (Transform child in previewUnit.transform)
         {
@@ -977,21 +995,21 @@ public class SPUM_Manager : MonoBehaviour
         }
         foreach (var matchingElement in allMatchingElements)
         {
-            var matchingTypeElement = DebugList.FirstOrDefault(ie => 
+            var matchingTypeElement = DebugList.FirstOrDefault(ie =>
             (ie.UnitType == matchingElement.UnitType)
             && (ie.PartType == matchingElement.PartType)
             //&& ie.Index == matchingElement.Index
             && (ie.Dir == matchingElement.Dir)
-            && (ie.Structure == matchingElement.Structure) 
+            && (ie.Structure == matchingElement.Structure)
             && ie.PartSubType == matchingElement.PartSubType
             );
             //Debug.Log(matchingTypeElement != null);
             if (matchingTypeElement != null)
             {
-                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath , matchingTypeElement.Structure);
+                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath, matchingTypeElement.Structure);
                 matchingElement.renderer.sprite = LoadSprite;
                 matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
-                matchingElement.renderer.color = matchingTypeElement.Color; 
+                matchingElement.renderer.color = matchingTypeElement.Color;
                 matchingElement.ItemPath = matchingTypeElement.ItemPath;
                 matchingElement.MaskIndex = matchingTypeElement.MaskIndex;
                 matchingElement.Color = matchingTypeElement.Color;
@@ -1002,42 +1020,48 @@ public class SPUM_Manager : MonoBehaviour
 
         previewUnit.ImageElement = DebugList;
 
-        
+
         //애니메이션 경로 체크
-        if(previewUnit.spumPackages.Count > 0){
+        if (previewUnit.spumPackages.Count > 0)
+        {
             bool clipPathExists = true;
             var ClipList = previewUnit.spumPackages.SelectMany(package => package.SpumAnimationData).ToList();
-            
+
             foreach (var clip in ClipList)
             {
                 clipPathExists = ValidateAnimationClips(clip);
-                if(!clipPathExists){
+                if (!clipPathExists)
+                {
                     // 패키지 네임 // 애니메이션 타입 // 애니메이션 이름
                     var dataArray = clip.ClipPath.Split("/");
 
                     var PackageDataName = dataArray[0];
-                    if(PackageDataName.Equals("Addons")){
+                    if (PackageDataName.Equals("Addons"))
+                    {
                         PackageDataName = dataArray[1];
                     }
                     var PackageNameExist = SpritePackageNameList.Contains(PackageDataName);
-                    if(!PackageNameExist)
+                    if (!PackageNameExist)
                     {
                         //Debug.Log("MissingPackage");
                         MissingPackageNames.Add(PackageDataName);
                     }
                     var PackageName = PackageNameExist ? PackageDataName : "";
-                    var ClipName = dataArray[dataArray.Length-1];
+                    var ClipName = dataArray[dataArray.Length - 1];
                     var ExtractList = ExtractTextureData(PackageName, clip.UnitType, clip.StateType, ClipName);
                     var data = ExtractList.FirstOrDefault();
-                    if(data != null){
-                    Debug.Log($" Package {PackageNameExist} {PackageName} {ClipName} {data.Name} {data.Path}");
-                        
+                    if (data != null)
+                    {
+                        Debug.Log($" Package {PackageNameExist} {PackageName} {ClipName} {data.Name} {data.Path}");
+
                         clip.ClipPath = data.Path;
                     }
                 }
             }
 
-        }else{
+        }
+        else
+        {
             //애니메이션 데이터 초기화
             previewUnit.spumPackages = GetSpumLegacyData();
         }
@@ -1053,9 +1077,9 @@ public class SPUM_Manager : MonoBehaviour
         //     clipPathExists = false;
         // }
         // #else
-        
+
         AnimationClip LoadClip = Resources.Load<AnimationClip>(clipData.ClipPath.Replace(".anim", ""));
-        
+
         if (LoadClip == null)
         {
             Debug.LogWarning($"Failed to load animation clip '{clipData.ClipPath}'.");
@@ -1063,7 +1087,7 @@ public class SPUM_Manager : MonoBehaviour
         }
         return clipPathExists;
     }
-    
+
     public SPUM_Prefabs SaveConvertPrefabs(UnityEngine.Object asset)
     {
         var SpumPreviewUnit = PreviewPrefab;
@@ -1071,13 +1095,13 @@ public class SPUM_Manager : MonoBehaviour
 
         SpumPreviewUnit._code = prefabName;
         //SpumPreviewUnit.EditChk = false;
-        
+
         GameObject prefabs = Instantiate(previewUnit.gameObject);
         SPUM_Prefabs SpumUnitData = prefabs.GetComponent<SPUM_Prefabs>();
         SpumUnitData.ImageElement = DebugList;
         SpumUnitData.spumPackages = SpumPreviewUnit.spumPackages;
         // 비활성화된 오브젝트 삭제하기
-        
+
         prefabs.transform.localScale = Vector3.one;
         prefabs.transform.position = Vector3.zero;
         SpumUnitData._version = _version;
@@ -1086,9 +1110,9 @@ public class SPUM_Manager : MonoBehaviour
         SpumUnitData._anim.Rebind();
         var sourcePath = AssetDatabase.GetAssetPath(asset);
         var FileName = sourcePath.Split("/");
-        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length-1], "") : unitPath;
-        Debug.Log(sourcePath.Replace(asset.name+".prefab", "").Replace(asset.name+".Prefab", "")  );
-        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,path+SpumUnitData._code+".prefab");
+        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length - 1], "") : unitPath;
+        Debug.Log(sourcePath.Replace(asset.name + ".prefab", "").Replace(asset.name + ".Prefab", ""));
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs, path + SpumUnitData._code + ".prefab");
         DestroyImmediate(prefabs);
         AssetDatabase.Refresh();
         UIManager.ToastOn("Saved Unit Object " + prefabName);
@@ -1098,7 +1122,7 @@ public class SPUM_Manager : MonoBehaviour
         var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
         Prefab.PopulateAnimationLists();
         return Prefab;
-        
+
     }
     public void MoveOldPrefabBackup(UnityEngine.Object asset)
     {
@@ -1108,12 +1132,13 @@ public class SPUM_Manager : MonoBehaviour
             Directory.CreateDirectory(unitBackUpPath);
             AssetDatabase.Refresh();
             Debug.Log("Folder created at: " + unitBackUpPath);
-        }  
-        var destinationPath = unitBackUpPath+asset.name+"_Backup.Prefab";
+        }
+        var destinationPath = unitBackUpPath + asset.name + "_Backup.Prefab";
         AssetDatabase.MoveAsset(sourcePath, destinationPath);
         AssetDatabase.Refresh();
     }
-    public List<PreviewMatchingElement> SetLegacyHorseData(){
+    public List<PreviewMatchingElement> SetLegacyHorseData()
+    {
         string PackageName = "Legacy";
         string UnitType = "Horse";
         string PartType = "Body";
@@ -1123,10 +1148,10 @@ public class SPUM_Manager : MonoBehaviour
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
 
@@ -1154,13 +1179,14 @@ public class SPUM_Manager : MonoBehaviour
     {
         var SpumPrefab = PrefabObject;
         var version = SpumPrefab._version;
-        var UnitType =  SpumPrefab.UnitType;
+        var UnitType = SpumPrefab.UnitType;
         var MatchingList = SpumPrefab.GetComponentsInChildren<SPUM_MatchingList>();
         bool isMatchingListExist = MatchingList != null || MatchingList.Length > 0; // 2.0 시스템
         bool isVersionSame = SpumPrefab._version == version;
         var NewDataListElement = new List<PreviewMatchingElement>();
         var OldData = SpumPrefab.GetComponentInChildren<SPUM_SpriteList>(); // 1.0 시스템
-        if(OldData == null) {
+        if (OldData == null)
+        {
             //DebugList.AddRange(PrefabObject.ImageElement);
             return (2, PrefabObject.ImageElement);
         }
@@ -1176,7 +1202,8 @@ public class SPUM_Manager : MonoBehaviour
         //     HorseBodySet.AddRange(StringToSpumElementList("Horse", (horseString, renderer)));
         // }
         // NewDataListElement.AddRange(HorseBodySet);
-        if(HorseExist){
+        if (HorseExist)
+        {
             var horseReset = SetLegacyHorseData();
             NewDataListElement.AddRange(horseReset);
         }
@@ -1184,7 +1211,7 @@ public class SPUM_Manager : MonoBehaviour
         string Unitype = "Unit";
 
         // 메인 바디 
-        
+
 
 
         var hairString = OldData._hairListString;
@@ -1198,13 +1225,13 @@ public class SPUM_Manager : MonoBehaviour
             MaskSet.AddRange(StringToSpumElementList(Unitype, tuple));
         }
         //Debug.Log("count " + MaskSet.Count);
-        List<string> requiredPartTypes = new List<string> { "Hair", "Helmet"};
+        List<string> requiredPartTypes = new List<string> { "Hair", "Helmet" };
         bool result = requiredPartTypes.All(partType => MaskSet.Any(element => element.PartType == partType));
-        if(result) 
+        if (result)
         {
             foreach (var item in MaskSet)
             {
-                if(item.PartType.Equals("Hair")) item.MaskIndex = 1;
+                if (item.PartType.Equals("Hair")) item.MaskIndex = 1;
             }
         }
 
@@ -1270,13 +1297,13 @@ public class SPUM_Manager : MonoBehaviour
 
         //DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255));
         var eyeString = "";
-        var eyeList = OldData._eyeList; 
+        var eyeList = OldData._eyeList;
         var EyeColorSet = new List<PreviewMatchingElement>();
         foreach (var renderer in eyeList)
         {
             EyeColorSet.AddRange(StringToSpumElementList(Unitype, (eyeString, renderer)));
         }
-    
+
         var EyeDistict = EyeColorSet.Distinct().GroupBy(x => new { x.Structure }).Select(g => g.First()).ToList();
         //Debug.Log(EyeDistict.Count + " ======= EyeDistict Count");
         // UIManager.ConvertView.WarningEyeText.SetActive(EyeDistict.Count.Equals(0));
@@ -1287,9 +1314,9 @@ public class SPUM_Manager : MonoBehaviour
         {
             foreach (var sprite in eyeList)
             {
-                if(sprite.name.Equals(item.Structure)) 
-                { 
-                    item.Color = sprite.color; 
+                if (sprite.name.Equals(item.Structure))
+                {
+                    item.Color = sprite.color;
                 }
             }
         }
@@ -1299,7 +1326,7 @@ public class SPUM_Manager : MonoBehaviour
         // }
         NewDataListElement.AddRange(EyeDistict);
         //Debug.Log("Unit? " + string.IsNullOrWhiteSpace(horseString));
-        
+
         var distinct = NewDataListElement.Distinct()
         .GroupBy(x => new { x.UnitType, x.PartType, x.Structure, x.Dir })
             .Select(g => g.First())
@@ -1317,16 +1344,16 @@ public class SPUM_Manager : MonoBehaviour
     }
     public List<PreviewMatchingElement> DefaultData(string UnitType, string PartType, string TextureName, Color color)
     {
-        string PackageName ="Legacy";
+        string PackageName = "Legacy";
         //패키지 구룹화
         var groupedData = spumPackages
             .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
             .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
             .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
-            .Select(g => new 
-            { 
-                Key = g.Key, 
-                Items = g.ToList() 
+            .Select(g => new
+            {
+                Key = g.Key,
+                Items = g.ToList()
             })
             .ToList();
 
@@ -1359,25 +1386,26 @@ public class SPUM_Manager : MonoBehaviour
         string pattern = @"Packages\/([^\/]+)\/";
         // 패키지는 없지만 이미지 이름은 있는 경우
         bool isPackage = false;
-        
+
         System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(PartPath, pattern);
         if (match.Success)
         {
             PackageName = match.Groups[1].Value;
             isPackage = true;
         }
-        if(PackageName.Equals("Heroes")) PackageName = "RetroHeroes";
+        if (PackageName.Equals("Heroes")) PackageName = "RetroHeroes";
         bool missingPackage = isPackage && !SpritePackageNameList.Contains(PackageName);
-        if(missingPackage)
+        if (missingPackage)
         {
             //예외 처리
-            
+
             //Debug.Log("MissingPackage");
             MissingPackageNames.Add(PackageName);
         }
 
         // 경로가 없지만 이미지 리소스는 있는경우 , 패키지 이름은 매칭되지만 패키지 리스트에 없는 경우
-        if( ((PartPath == "") && (Tuple.Item2.sprite != null)) || missingPackage){
+        if (((PartPath == "") && (Tuple.Item2.sprite != null)) || missingPackage)
+        {
             var path = AssetDatabase.GetAssetPath(Tuple.Item2.sprite);
             //Assets/SPUM/Resources/Elf/0_Unit/0_Sprite/0_Body/New_Elf_1.png
             PartPath = path;
@@ -1390,48 +1418,48 @@ public class SPUM_Manager : MonoBehaviour
             {
                 PackageName = match2.Groups[1].Value;
             }
-            
+
 
         }
-        if(string.IsNullOrWhiteSpace(PartPath)) return new List<PreviewMatchingElement>();
+        if (string.IsNullOrWhiteSpace(PartPath)) return new List<PreviewMatchingElement>();
         //var SpriteRendererData = Tuple.Item2;
-        
 
 
-        var PathArray =  PartPath.Split("/");
-        string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
+
+        var PathArray = PartPath.Split("/");
+        string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length - 2], @"[^a-zA-Z가-힣\s]", "");
         // if(Tuple.Item1 != "") {
         //     Debug.Log("=====================" +Tuple.Item1);
         //     var PathArray2 = Tuple.Item1.Split('/');
         //     PartType = System.Text.RegularExpressions.Regex.Replace(PathArray2[PathArray2.Length-2],@"[^a-zA-Z가-힣\s]", "");
         //     Debug.Log("=====================" +PartType);
         // }
-        string NoNamePackagePartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-3],@"[^a-zA-Z가-힣\s]", "");
+        string NoNamePackagePartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length - 3], @"[^a-zA-Z가-힣\s]", "");
         PartType = PartPath.Contains("BodySource") ? "Body" : NoNamePackagePartType.Equals("Weapons") ? "Weapons" : PartType; // 구 바디 예외
 
         // string NoNamePackagePartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
         // PartType = PartPath.Contains("BodySource") ? "Body" :  PartType; // 구 바디 예외
-        string PartName = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-1], @"\..*", "");
+        string PartName = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length - 1], @"\..*", "");
         //Debug.Log(PackageName+"/"+unitType +"/"+ PartType+"/"+PartName + "/" + NoNamePackagePartType);
-        if(NoNamePackagePartType.Equals("BasicResources")) 
+        if (NoNamePackagePartType.Equals("BasicResources"))
         {
             PartType = PartType.Replace("Backup", "");
         }
         var dir = "";
         bool isHide = false;
-        if(PartType.Equals("Helmet"))
+        if (PartType.Equals("Helmet"))
         {
-            if(Tuple.Item2.name == "12_Helmet2") { dir = "Front"; isHide = Tuple.Item1 == ""; }
-            if(Tuple.Item2.name == "11_Helmet1") { dir = "Front"; isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "12_Helmet2") { dir = "Front"; isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "11_Helmet1") { dir = "Front"; isHide = Tuple.Item1 == ""; }
         }
 
 
-        if(PartType.Equals("Weapons"))
+        if (PartType.Equals("Weapons"))
         {
-            if(Tuple.Item2.name == "R_Weapon") { dir = "Right"; isHide = Tuple.Item1 == ""; }
-            if(Tuple.Item2.name == "R_Shield") { dir = "Right"; isHide = Tuple.Item1 == ""; }
-            if(Tuple.Item2.name == "L_Weapon") { dir = "Left";  isHide = Tuple.Item1 == ""; }
-            if(Tuple.Item2.name == "L_Shield") { dir = "Left";  isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "R_Weapon") { dir = "Right"; isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "R_Shield") { dir = "Right"; isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "L_Weapon") { dir = "Left"; isHide = Tuple.Item1 == ""; }
+            if (Tuple.Item2.name == "L_Shield") { dir = "Left"; isHide = Tuple.Item1 == ""; }
             // r weapon
             // r shield
             // l weapon
@@ -1441,7 +1469,7 @@ public class SPUM_Manager : MonoBehaviour
         //Debug.Log(PackageName + " : " + unitType+ " : " + PartType+ " : " + PartName);
         //패키지 구룹화
         var ExtractList = ExtractTextureData(PackageName, unitType, PartType, PartName);
-        
+
         var ListElement = new List<PreviewMatchingElement>();
         foreach (var item in ExtractList)
         {
@@ -1453,7 +1481,7 @@ public class SPUM_Manager : MonoBehaviour
             part.PartType = PartType;
             part.PartSubType = item.PartSubType;
             part.Dir = dir;//ButtonData.Direction;
-            part.ItemPath =  isHide ? "" : item.Path;
+            part.ItemPath = isHide ? "" : item.Path;
             part.Structure = item.SubType.Equals(item.Name) ? PartType : item.SubType;
             part.MaskIndex = 0;//(int)ButtonData.SpriteMask;
             part.Color = Tuple.Item2.color;//ButtonData.PartSpriteColor;
@@ -1473,29 +1501,31 @@ public class SPUM_Manager : MonoBehaviour
             var dataArray = oldData.ItemPath.Split("/");
 
             var PackageDataName = dataArray[0];
-            if(PackageDataName.Equals("Addons")){
+            if (PackageDataName.Equals("Addons"))
+            {
                 PackageDataName = dataArray[1];
             }
             var PackageNameExist = SpritePackageNameList.Contains(PackageDataName);
-            if(!PackageNameExist)
+            if (!PackageNameExist)
             {
                 //Debug.Log("MissingPackage");
                 MissingPackageNames.Add(PackageDataName);
             }
             var PackageName = PackageNameExist ? PackageDataName : "";
-            var PartName = dataArray[dataArray.Length-1];
+            var PartName = dataArray[dataArray.Length - 1];
             var ExtractList = ExtractTextureData(PackageName, oldData.UnitType, oldData.PartType, PartName);
             var data = ExtractList.FirstOrDefault();
             //Debug.Log($" Package" + oldData.PartType + "/" + PartName);
-            if(data != null){
-            //Debug.Log($" Package {PackageNameExist} {PackageName} {PartName} {data.Name} {data.Path}");
-                if(oldData.PartType.Equals("Weapons"))
+            if (data != null)
+            {
+                //Debug.Log($" Package {PackageNameExist} {PackageName} {PartName} {data.Name} {data.Path}");
+                if (oldData.PartType.Equals("Weapons"))
                 {
                     var PathArray = data.Path.Split("/");
-                    string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
+                    string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length - 2], @"[^a-zA-Z가-힣\s]", "");
                     oldData.PartSubType = PartType;
                 }
-                
+
                 oldData.ItemPath = data.Path;
                 oldData.Color = oldData.Color.Equals(Color.clear) ? Color.white : oldData.Color;
                 ModifiyList.Add(oldData);
@@ -1525,7 +1555,7 @@ public class SPUM_Manager : MonoBehaviour
 
         return query
             .SelectMany(package => package.SpumTextureData)
-            .Where(texture => 
+            .Where(texture =>
                 texture.UnitType == unitType &&
                 texture.PartType == partType &&
                 texture.Name == textureName)
@@ -1542,7 +1572,7 @@ public class SPUM_Manager : MonoBehaviour
 
         return query
             .SelectMany(package => package.SpumAnimationData)
-            .Where(clip => 
+            .Where(clip =>
                 clip.UnitType == unitType &&
                 clip.StateType == partType &&
                 clip.Name == clipeName)
@@ -1553,19 +1583,19 @@ public class SPUM_Manager : MonoBehaviour
     public void DeleteUnit(UnityEngine.Object prefab)
     {
         string pathToDelete = AssetDatabase.GetAssetPath(prefab);
-        Debug.Log(pathToDelete); 
+        Debug.Log(pathToDelete);
         AssetDatabase.DeleteAsset(pathToDelete);
 
         UIManager.ShowNowUnitNumber();
         UIManager.SetActiveLoadPanel(false);
         OpenLoadData();
     }
-#endregion
+    #endregion
 
     public Sprite LoadSpriteFromMultiple(string path, string spriteName)
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>(path);
-        
+
         if (sprites == null || sprites.Length == 0)
         {
             Debug.LogWarning($"No sprites found at path: {path}");
@@ -1580,12 +1610,12 @@ public class SPUM_Manager : MonoBehaviour
     //Resolve
     public void CheckVesionFile()
     {
-        if(File.Exists("Assets/SPUM/Script/SPUM_TexutreList.cs"))
+        if (File.Exists("Assets/SPUM/Script/SPUM_TexutreList.cs"))
         {
             Debug.Log("Filex Exits, will delete it");
             FileUtil.DeleteFileOrDirectory("Assets/SPUM/Script/SPUM_TexutreList.cs");
         }
     }
-    #endif
+#endif
     //Package 
 }

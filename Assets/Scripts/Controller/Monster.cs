@@ -14,15 +14,21 @@ public enum MonsterState
 
 public class Monster : MonoBehaviour
 {
-    UnitStats stats = new UnitStats("Monster",100, 10, 5, 1);
+    string Name;
+    UnitStats stats = new UnitStats("Monster", 100, 10, 5, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
 
     [SerializeField] Animator animCtrl;
 
+    private void Awake()
+    {
+        
+    }
+
     //기본 애니메이션 세팅
     public void SetAnim(MonsterState state)
     {
-        switch(state)
+        switch (state)
         {
             case MonsterState.IDLE:
                 animCtrl.SetTrigger("Idle");

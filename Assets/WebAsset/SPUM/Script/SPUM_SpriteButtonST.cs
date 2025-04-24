@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,52 +27,54 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     public string ItemShowType;
     public string DefaultPackageName = "Legacy";
     public string DefaultTextureName;
-    public List<string> ignoreColorPart = new ();
+    public List<string> ignoreColorPart = new();
     public SpriteMaskInteraction SpriteMask = SpriteMaskInteraction.None;
-    
-    public bool IsActive 
+
+    public bool IsActive
     {
         get { return isActive; }
         set
         {
             isActive = value;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             SetActiveColor(value);
-            #endif
+#endif
         }
     }
 
     public Color PartSpriteColor
-    { 
+    {
         get { return partSpriteColor; }
         set
         {
             partSpriteColor = value;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             SetSpriteColor(value);
-            #endif
+#endif
         }
     }
-    
-    #if UNITY_EDITOR
-    void Awake(){
+
+#if UNITY_EDITOR
+    void Awake()
+    {
         partSpriteColor = InitColor;
         UnitType = string.IsNullOrEmpty(UnitType) ? "Unit" : UnitType;
-        PartType =  string.IsNullOrEmpty(PartType) ? gameObject.name : PartType;
+        PartType = string.IsNullOrEmpty(PartType) ? gameObject.name : PartType;
         ItemShowType = gameObject.name;
     }
     void Start()
     {
-        if(_mainSprite == null ) _mainSprite = transform.GetChild(0).GetChild(1).GetComponent<Image>();
-        if(_Manager == null ) {
-            #if UNITY_2023_1_OR_NEWER
+        if (_mainSprite == null) _mainSprite = transform.GetChild(0).GetChild(1).GetComponent<Image>();
+        if (_Manager == null)
+        {
+#if UNITY_2023_1_OR_NEWER
                 _Manager = FindFirstObjectByType<SPUM_Manager>();
-            #else
-                #pragma warning disable CS0618
-                _Manager = FindObjectOfType<SPUM_Manager>();
-                #pragma warning restore CS0618
-            #endif
-            }
+#else
+#pragma warning disable CS0618
+            _Manager = FindObjectOfType<SPUM_Manager>();
+#pragma warning restore CS0618
+#endif
+        }
 
         DrawButton = GetComponent<Button>();
         ChangeColorButton = transform.Find("ButtonSet/ButtonColor")?.GetComponent<Button>();
@@ -82,31 +82,44 @@ public class SPUM_SpriteButtonST : MonoBehaviour
         ResetSpriteButton = transform.Find("ButtonSet/ButtonDelete")?.GetComponent<Button>();
         LockButton = transform.Find("ButtonSet/LockBG")?.GetComponent<Button>();
 
-        DrawButton.onClick.AddListener(()=> {DrawItem();});
-        ChangeColorButton?.onClick.AddListener(()=> { 
-            if(IsActive) {
+        DrawButton.onClick.AddListener(() => { DrawItem(); });
+        ChangeColorButton?.onClick.AddListener(() =>
+        {
+            if (IsActive)
+            {
                 _Manager.UIManager.SetColorButton(this);
-            }else{
+            }
+            else
+            {
                 _Manager.UIManager.ToastOn(this.name + " No Selected");
             }
         });
-        ChangeRandomButton?.onClick.AddListener(()=> { 
-            if(IsActive || !IsSpriteFixed) {
+        ChangeRandomButton?.onClick.AddListener(() =>
+        {
+            if (IsActive || !IsSpriteFixed)
+            {
                 SetPartRandom();
-            }else{
+            }
+            else
+            {
                 _Manager.UIManager.ToastOn(this.name + " is Locked or No Selected");
             }
-             
+
         });
-        ResetSpriteButton?.onClick.AddListener(()=> {
-            if(!IsSpriteFixed) {
+        ResetSpriteButton?.onClick.AddListener(() =>
+        {
+            if (!IsSpriteFixed)
+            {
                 RemoveSprite();
-            }else{
+            }
+            else
+            {
                 _Manager.UIManager.ToastOn(this.name + " is Locked");
             }
         }
         );
-        LockButton?.onClick.AddListener(()=> {
+        LockButton?.onClick.AddListener(() =>
+        {
             ChangeLock();
             _Manager.UIManager.ToastOn(this.name + " is Locked " + IsSpriteFixed);
         });
@@ -121,10 +134,11 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     }
     public void SetActiveColor(bool value)
     {
-        if(value)
+        if (value)
         {
             _mainSprite.color = Color.red;
-            if(ToggleTarget) {
+            if (ToggleTarget)
+            {
                 ToggleTarget.SpriteMask = SpriteMaskInteraction.VisibleInsideMask;
                 _Manager.SetSpriteVisualMaskIndex(ToggleTarget);
             }//_Manager.SetSpriteVisualMaskIndex(ToggleTarget, SpriteMaskInteraction.VisibleInsideMask);
@@ -133,7 +147,7 @@ public class SPUM_SpriteButtonST : MonoBehaviour
         {
             _mainSprite.color = Color.white;
             _colorBG.color = Color.white;
-            if(ToggleTarget) 
+            if (ToggleTarget)
             {
                 ToggleTarget.SpriteMask = SpriteMaskInteraction.None;
                 _Manager.SetSpriteVisualMaskIndex(ToggleTarget);
@@ -146,9 +160,9 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     }
     public void SetPartRandom()
     {
-        if(IsSpriteFixed) return;
+        if (IsSpriteFixed) return;
         IsActive = true;
-        if(_Manager.RandomColorButton.isOn) ChangeRandomColor();
+        if (_Manager.RandomColorButton.isOn) ChangeRandomColor();
         _Manager.SetPartRandom(this);
     }
     public void SetInitPart()
@@ -158,16 +172,17 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     }
     public void ChangeRandomColor()
     {
-        if(IsSpriteFixed) return;
+        if (IsSpriteFixed) return;
 
         Color Color = Color.white;
-        if(Random.Range(0, 1.0f) > 0.1f) 
+        if (Random.Range(0, 1.0f) > 0.1f)
         {
-            Color = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f),1f);
+            Color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f), 1f);
             IsActive = true;
             ToggleTarget?.RemoveSprite();
         }
-        else{
+        else
+        {
             IsActive = false;
         }
 
@@ -175,14 +190,14 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     }
     public void RemoveSprite()
     {
-        if(IsSpriteFixed) return;
+        if (IsSpriteFixed) return;
         IsActive = false;
         _Manager.RemoveSprite(this);
     }
     public void ChangeLock()
     {
         IsSpriteFixed = !IsSpriteFixed;
-        if(_LockBtn[0].activeInHierarchy)
+        if (_LockBtn[0].activeInHierarchy)
         {
             _LockBtn[0].SetActive(false);
             _LockBtn[1].SetActive(true);
@@ -197,5 +212,5 @@ public class SPUM_SpriteButtonST : MonoBehaviour
     // {
     //     ToggleTarget?.RemoveSprite();
     // }
-    #endif
+#endif
 }
