@@ -11,6 +11,8 @@ public class UnitStats
     private int _speed;
     private int _attackCount;
     private int _defense;
+    private float _maxExp;
+    private float _currentExp;
 
     public string Name => _name;
     public int Level => _level;
@@ -22,6 +24,10 @@ public class UnitStats
     public int AttackCount => _attackCount;
     public bool IsDead => _currentHp <= 0;
 
+    public float MaxExp => _maxExp; 
+    public float CurrentExp => _currentExp;
+
+
     public UnitStats(string name, int maxHp, int attack, int def, int speed, int attackCount)
     {
         _name = name;
@@ -31,6 +37,8 @@ public class UnitStats
         _defense = def;
         _speed = speed;
         _attackCount = attackCount;
+        _currentExp = 0;
+        _maxExp = 100;
     }
     public void IncrementAttackCount(int amount)
     {

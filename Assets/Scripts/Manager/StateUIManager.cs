@@ -1,7 +1,7 @@
 using System.Collections;
-using System.Linq.Expressions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StateUIManager : MonoBehaviour
 {
@@ -11,6 +11,10 @@ public class StateUIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI atk;
     [SerializeField] TextMeshProUGUI def;
     [SerializeField] TextMeshProUGUI speed;
+
+    [SerializeField] Slider ExpSlider;
+    [SerializeField] Slider HPSlider;
+
 
     private UnitStats playerStats;
 
@@ -44,6 +48,10 @@ public class StateUIManager : MonoBehaviour
         atk.text = ChangeNumber(playerStats.Attack);
         def.text = ChangeNumber(playerStats.Defense);
         //speed.text = playerStats.Speed.ToString();
+
+        ExpSlider.value = playerStats.CurrentExp / playerStats.MaxExp;
+        HPSlider.value = (float)playerStats.CurrentHp / (float)playerStats.MaxHp;
+        Debug.Log(HPSlider.value);
     }
 
     private string ChangeNumber(int value)

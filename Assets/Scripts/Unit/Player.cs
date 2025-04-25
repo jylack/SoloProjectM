@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    UnitStats stats = new UnitStats("User", 10000, 10, 0, 5, 1);
+    UnitStats stats = new UnitStats("User", 1000, 10, 0, 5, 1);
     UnitStats applyStats = new UnitStats("", 0, 0, 0, 0, 0);
-    
+
     public BuffSystem Buffs = new BuffSystem();
 
     public Dictionary<string, Skill> SkillDict = new();
