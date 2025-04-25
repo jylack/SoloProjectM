@@ -5181,8 +5181,8 @@ MonoBehaviour:
   HpText: {fileID: 488843656}
   AtkText: {fileID: 2067090800}
   DefText: {fileID: 294448691}
-  Exp: {fileID: 2113506953}
-  Hp: {fileID: 821174303}
+  ExpSlider: {fileID: 2113506953}
+  HpSlider: {fileID: 821174303}
 --- !u!1 &1674335551
 GameObject:
   m_ObjectHideFlags: 0

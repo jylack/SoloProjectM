@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum MonsterState
@@ -9,7 +7,7 @@ public enum MonsterState
     ATK2,
     DAMAGE,
     MOVE,
-    DEATH,    
+    DEATH,
 }
 
 public class Monster : MonoBehaviour
@@ -38,9 +36,9 @@ public class Monster : MonoBehaviour
             case MonsterState.DAMAGE:
                 animCtrl.SetTrigger("Hit");
                 break;
-            case MonsterState.MOVE:
-                animCtrl.SetTrigger("Run");
-                break;
+            //case MonsterState.MOVE:
+            //    animCtrl.SetTrigger("Run");
+            //  break;
             case MonsterState.DEATH:
                 animCtrl.SetTrigger("Death");
                 break;

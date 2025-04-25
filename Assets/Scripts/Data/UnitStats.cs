@@ -4,11 +4,11 @@ using UnityEngine;
 public class UnitStats
 {
     private string _name;
-    private int _lvl;
-    private float _currentExp;
+    private int _lvl = 1;
+    private float _currentExp = 0;
     private float _maxExp;
-    private int _maxHp;
     private int _currentHp;
+    private int _maxHp;
     private int _attack;
     private int _defense;
     private int _speed;

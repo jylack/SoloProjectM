@@ -10,10 +10,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private LogUI battleLogUI;
 
     [SerializeField] private Transform playerTransform;
-    Player player;
+    private Player player;
 
     [SerializeField] private Transform monsterTransform;
-    Monster monster;
+    private Monster monster;
 
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private float attackDelay = 0.5f;
@@ -113,6 +113,7 @@ public class BattleManager : MonoBehaviour
                 if (currentAttacker == playerStats)
                 {
                     player.SetAnim(PlayerState.ATTACK);
+                    attackDelay = player.
                 }
                 else if (currentAttacker == monsterStats)
                 {

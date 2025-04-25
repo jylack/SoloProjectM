@@ -44,7 +44,9 @@ public class Player : MonoBehaviour
     public void SetAnim(PlayerState playerState)
     {
         animCtrl.PlayAnimation(playerState, 0);
+
     }
+
 
     //공격 애니메이션 세팅
     public void SetAtkAnim(PlayerState playerState, AttackType attackType)
