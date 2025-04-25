@@ -33,15 +33,17 @@ public class SPUM_Prefabs : MonoBehaviour
     public List<AnimationClip> DEATH_List = new();
     public List<AnimationClip> OTHER_List = new();
 
-    private void Awake()
-    {
-        // 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
-        PopulateAnimationLists();
+    //여기다 하지 않는이유는 이 소스가 실행되기전에 다른 오브젝트가 먼저 호출을 할경우 초기화가 진행되지않는걸 호출하기때문에 
+    //따로 메서드를 만들어서 호출해주면 된다. 자세한건 플레이어 AnimSetting()로 
+    //private void Awake()
+    //{
+    //    //// 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
+    //    //PopulateAnimationLists();
 
-        // 2) AnimatorOverrideController를 생성해서 
-        //    기존 런타임 컨트롤러의 각 클립을 복제(override)해 둡니다
-        OverrideControllerInit();
-    }
+    //    //// 2) AnimatorOverrideController를 생성해서 
+    //    ////    기존 런타임 컨트롤러의 각 클립을 복제(override)해 둡니다
+    //    //OverrideControllerInit();
+    //}
 
     public void OverrideControllerInit()
     {
@@ -169,10 +171,10 @@ public class SPUM_Prefabs : MonoBehaviour
         Animator animator = _anim;
         //Debug.Log(PlayState.ToString());
         
-        while(StateAnimationPairs != null)
-        {
+        //while(StateAnimationPairs != null)
+        //{
 
-        }
+        //}
         var animations = StateAnimationPairs[PlayState.ToString()];
         //Debug.Log(OverrideController[PlayState.ToString()].name);
         OverrideController[PlayState.ToString()] = animations[index];

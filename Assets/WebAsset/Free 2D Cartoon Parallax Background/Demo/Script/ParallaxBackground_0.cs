@@ -27,6 +27,7 @@ public class ParallaxBackground_0 : MonoBehaviour
     // 오브젝트의 x축 스케일 (localScale.x)
     private float sizeX;
 
+    
     void Start()
     {
         _camera = Camera.main.transform;

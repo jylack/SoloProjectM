@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
+    public Player PlayerState;
+
     public int currentDay = 1; // 현재 날짜
 
     private void Awake()
@@ -26,7 +28,12 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-        }
+        }                
+    }
+
+    public Player GetPlayer()
+    {
+        return PlayerState;
     }
 
 

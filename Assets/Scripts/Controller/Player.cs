@@ -24,6 +24,16 @@ public class Player : MonoBehaviour
 
     [SerializeField] SPUM_Prefabs animCtrl;
 
+  
+    public void AnimSetting()
+    {
+        //// 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
+        animCtrl.PopulateAnimationLists();
+
+        //// 2) AnimatorOverrideController를 생성해서 
+        ////    기존 런타임 컨트롤러의 각 클립을 복제(override)해 둡니다
+        animCtrl.OverrideControllerInit();
+    }
 
     //장비 등등 받아서 스텟 업데이트 해줌.
     //어떤 공격할때 확률적으로 크리티컬같은거 뜨면 계산해서 데미지 넘겨줌.

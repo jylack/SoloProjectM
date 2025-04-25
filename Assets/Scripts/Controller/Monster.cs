@@ -20,10 +20,6 @@ public class Monster : MonoBehaviour
 
     [SerializeField] Animator animCtrl;
 
-    private void Awake()
-    {
-        
-    }
 
     //기본 애니메이션 세팅
     public void SetAnim(MonsterState state)

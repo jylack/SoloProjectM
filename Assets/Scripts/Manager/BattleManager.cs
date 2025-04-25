@@ -30,6 +30,8 @@ public class BattleManager : MonoBehaviour
     {
         player = playerTransform.GetComponent<Player>();
         playerStats = player.GetStats();
+        player.AnimSetting();
+
         monster = monsterTransform.GetComponent<Monster>();
         monsterStats = monster.GetStats();
 
@@ -56,7 +58,7 @@ public class BattleManager : MonoBehaviour
         Vector3 monsterTarget = monsterStart + Vector3.left * 3.5f;
         yield return MoveOverTime(monsterTransform, monsterStart, monsterTarget, moveDuration);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(attackDelay);
 
         // 연출: 배경 카메라 이동중지
         parallaxBackground.Camera_Move = false;
@@ -134,6 +136,9 @@ public class BattleManager : MonoBehaviour
 
                 //방어자 죽었는가 판별
                 if (currentDefender.IsDead) break;
+
+
+                //공격 딜레이 이걸 나중에 애니메이션 속도랑 동기화해줄예정임 //각애니메이션마다 길이가 다름.
                 yield return new WaitForSeconds(attackDelay);
             }
 
@@ -169,8 +174,8 @@ public class BattleManager : MonoBehaviour
             (currentAttacker, currentDefender) = (currentDefender, currentAttacker);
 
 
-
-            yield return new WaitForSeconds(0.5f);
+            //공격 쿨타임 이걸 나중에 애니메이션 속도랑 동기화해줄예정임
+            yield return new WaitForSeconds(attackDelay);
         }
     }
 

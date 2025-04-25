@@ -1768,6 +1768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e8179ea20970a9409ea28c38b78d169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerState: {fileID: 2032462568}
   currentDay: 1
 --- !u!4 &537455656
 Transform:
@@ -4582,6 +4583,7 @@ GameObject:
   - component: {fileID: 1628031068}
   - component: {fileID: 1628031070}
   - component: {fileID: 1628031069}
+  - component: {fileID: 1628031071}
   m_Layer: 5
   m_Name: StateUI
   m_TagString: Untagged
@@ -4650,6 +4652,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1628031067}
   m_CullTransparentMesh: 1
+--- !u!114 &1628031071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628031067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e1fe627057acbd40b1369aae8959b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LvlText: {fileID: 1188108362}
+  HpText: {fileID: 488843656}
+  AtkText: {fileID: 2067090800}
+  DefText: {fileID: 294448691}
 --- !u!1 &1674335551
 GameObject:
   m_ObjectHideFlags: 0
