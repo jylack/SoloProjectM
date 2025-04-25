@@ -5,6 +5,8 @@ public class UnitStats
 {
     private string _name;
     private int _lvl;
+    private float _currentExp;
+    private float _maxExp;
     private int _maxHp;
     private int _currentHp;
     private int _attack;
@@ -17,6 +19,8 @@ public class UnitStats
     public string Name => _name;
 
     public int Lvl => _lvl;
+    public float CurrentExp => _currentExp;
+    public float MaxExp => _maxExp;
     public int MaxHp => _maxHp;
     public int CurrentHp => _currentHp;
     public int Attack => _attack;
