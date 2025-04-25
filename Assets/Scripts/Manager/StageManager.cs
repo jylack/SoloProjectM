@@ -107,7 +107,7 @@ public class StageManager : MonoBehaviour
     public void TriggerBuffEvent()
     {
         Buff powerBuff = new Buff("힘의 룬", 3, 10, 0);
-        GameManager.instance.PlayerBuffs.AddBuff(powerBuff);
+        GameManager.instance.player.Buffs.AddBuff(powerBuff);
         logUI.AddLog("힘의 룬이 부여되었습니다! (3턴간 공격력 +10)");
     }
 

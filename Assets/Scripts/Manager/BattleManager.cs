@@ -36,7 +36,7 @@ public class BattleManager : MonoBehaviour
         foreach (var m in monsterStatsList)
             monsterBuffsList.Add(new BuffSystem());
 
-        playerSkills = GameManager.instance.PlayerSkills;
+        playerSkills = GameManager.instance.player.Skills;
 
         stateUIManager.RefreshUI();
         StartCoroutine(BattleRoutine());

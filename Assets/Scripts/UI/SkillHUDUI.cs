@@ -24,7 +24,7 @@ public class SkillHudUI : MonoBehaviour
         spawnedIcons.Clear();
 
         // 플레이어 스킬 리스트 불러오기
-        var skills = GameManager.instance.PlayerCurrentSkills;
+        var skills = GameManager.instance.player.Skills;
         foreach (var skill in skills)
         {
             GameObject icon = Instantiate(iconPrefab, iconParent);

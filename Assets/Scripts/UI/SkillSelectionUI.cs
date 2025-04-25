@@ -38,7 +38,7 @@ public class SkillSelectionUI : MonoBehaviour
 
     private void OnSkillSelected(Skill selected)
     {
-        GameManager.instance.PlayerSkills.Add(selected);
+        GameManager.instance.player.Skills.Add(selected);
         //LogUI.Instance.AddLog($"{selected.Name} Ω∫≈≥¿ª »πµÊ«ﬂΩ¿¥œ¥Ÿ!");
         rootPanel.SetActive(false);
         GameManager.instance.OnInGameEnd();

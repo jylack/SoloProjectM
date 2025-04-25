@@ -2072,6 +2072,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e8179ea20970a9409ea28c38b78d169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 2032462568}
   currentStage: 0
   currentDay: 1
 --- !u!4 &537455656
@@ -2840,9 +2841,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 291efd2b9dce3cf40a9069ed2c67eaa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slots: []
-  rootPanel: {fileID: 483135131}
-  stagePanel: {fileID: 891107034}
+  iconParent: {fileID: 0}
+  iconPrefab: {fileID: 0}
 --- !u!1 &839379248
 GameObject:
   m_ObjectHideFlags: 0
@@ -3063,7 +3063,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00002670288}
+  m_AnchoredPosition: {x: 0, y: 0.000102996826}
   m_SizeDelta: {x: 0, y: 91}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &891107036
@@ -5708,6 +5708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2032462567}
   - component: {fileID: 2032462566}
+  - component: {fileID: 2032462568}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -5783,6 +5784,18 @@ Transform:
   - {fileID: 1558934568}
   m_Father: {fileID: 1469282283}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2032462568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032462565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf543b451ac89f249a03853d9036b6e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2043392285
 GameObject:
   m_ObjectHideFlags: 0

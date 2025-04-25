@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public Player player;
+
     public UnitStats PlayerBaseStats; // 룸씬에서 장비 반영된 최종 스탯
 
     public UnitStats PlayerCurrentStats; // 인게임 전용 복사본
@@ -22,11 +24,11 @@ public class GameManager : MonoBehaviour
     public int currentStage = 0;
     public int currentDay = 1; // 로그 출력을 위한 현재 날짜
 
-    public BuffSystem PlayerBuffs = new BuffSystem();
+    //public BuffSystem PlayerBuffs = new BuffSystem();
 
-    public Dictionary<string, Skill> PlayerSkillDict = new();
-    public List<Skill> PlayerSkills => new List<Skill>(PlayerSkillDict.Values);
-    public List<Skill> PlayerCurrentSkills => new List<Skill>(PlayerSkillDict.Values);
+    //public Dictionary<string, Skill> PlayerSkillDict = new();
+    //public List<Skill> PlayerSkills => new List<Skill>(PlayerSkillDict.Values);
+    //public List<Skill> PlayerCurrentSkills => new List<Skill>(PlayerSkillDict.Values);
 
     private void Awake()
     {
@@ -35,21 +37,12 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        SetPlayerBaseStats(new UnitStats("Player", 10000, 10, 0, 5, 1)); // 기본 스탯 초기화
+       // SetPlayerBaseStats(new UnitStats("Player", 10000, 10, 0, 5, 1)); // 기본 스탯 초기화
         
     }
    public void AddSkill(Skill newSkill)
     {
-        if (PlayerSkillDict.ContainsKey(newSkill.Name))
-        {
-            PlayerSkillDict[newSkill.Name].ApplyStack(newSkill);
-            //LogUI.Instance.AddLog($"스킬 강화: {newSkill.Name} (스택 {PlayerSkillDict[newSkill.Name].Stack})");
-        }
-        else
-        {
-            PlayerSkillDict[newSkill.Name] = newSkill.Clone();
-            //LogUI.Instance.AddLog($"스킬 획득: {newSkill.Name}");
-        }
+        player.AddSkill(newSkill);
     }
 
     public void ShowOptionUI()
