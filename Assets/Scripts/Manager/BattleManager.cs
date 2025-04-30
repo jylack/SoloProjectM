@@ -24,8 +24,6 @@ public class BattleManager : MonoBehaviour
     private UnitStats currentDefender;
 
 
-
-
     private void OnEnable()
     {
         player = playerTransform.GetComponent<Player>();
@@ -113,11 +111,11 @@ public class BattleManager : MonoBehaviour
                 if (currentAttacker == playerStats)
                 {
                     player.SetAnim(PlayerState.ATTACK);
-                    attackDelay = player.
+                    //attackDelay = player.
                 }
                 else if (currentAttacker == monsterStats)
                 {
-                    monster.SetAnim(MonsterState.ATK1);
+                    monster.SetAnim(MonsterState.ATK1);                                                      
                 }
 
                 if (currentDefender == playerStats)
