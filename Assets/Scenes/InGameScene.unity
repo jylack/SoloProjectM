@@ -3067,6 +3067,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleLogUI: {fileID: 1369412105}
+  stateUI: {fileID: 1628031071}
   playerTransform: {fileID: 2032462567}
   monsterTransform: {fileID: 1261482415}
   moveDuration: 0.5

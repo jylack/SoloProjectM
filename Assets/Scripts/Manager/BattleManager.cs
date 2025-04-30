@@ -8,6 +8,7 @@ public class BattleManager : MonoBehaviour
     private UnitStats monsterStats;
 
     [SerializeField] private LogUI battleLogUI;
+    [SerializeField] private StateUI stateUI;
 
     [SerializeField] private Transform playerTransform;
     private Player player;
@@ -128,7 +129,7 @@ public class BattleManager : MonoBehaviour
                 }
 
                 currentDefender.TakeDamage(currentAttacker.Attack);
-
+                stateUI.RefreshUI(playerStats);
 
                 // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
                 //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
