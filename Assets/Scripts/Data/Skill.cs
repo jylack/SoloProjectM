@@ -10,9 +10,10 @@ public class Skill
     public string Description { get; private set; } // 스킬 설명
     public int Damage { get; private set; } // 스킬 데미지
     public int Turns { get; private set; } // 스킬 사용가능 턴 
-    public int ComboCount { get; private set; } // 스킬 콤보 수
+    public int ComboCount { get; private set; } // 스킬 콤보 수설
+    public AnimationClip AnimationClip { get; private set; }
 
-    public Skill(Sprite icon , string name, string description, int damage, int turns, int comboCount)
+    public Skill(Sprite icon , string name, string description, int damage, int turns, int comboCount , AnimationClip anim)
     {
         Icon = icon;
         Name = name;
@@ -20,6 +21,7 @@ public class Skill
         Damage = damage;
         Turns = turns;
         ComboCount = comboCount;
+        AnimationClip = anim;
     }
 
     public bool IsUsable(int userTurn)

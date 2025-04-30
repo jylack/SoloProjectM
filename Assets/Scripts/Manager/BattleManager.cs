@@ -1,11 +1,15 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
     private UnitStats playerStats;
+    private List<UnitStats> player_list = new();
+
     private UnitStats monsterStats;
+    private List<UnitStats> monster_list = new();
 
     [SerializeField] private LogUI battleLogUI;
     [SerializeField] private StateUI stateUI;
@@ -30,6 +34,8 @@ public class BattleManager : MonoBehaviour
         player = playerTransform.GetComponent<Player>();
         playerStats = player.GetStats();
         player.AnimSetting();
+
+
 
         monster = monsterTransform.GetComponent<Monster>();
         monsterStats = monster.GetStats();
@@ -129,6 +135,8 @@ public class BattleManager : MonoBehaviour
                 }
 
                 currentDefender.TakeDamage(currentAttacker.Attack);
+                
+
                 stateUI.RefreshUI(playerStats);
 
                 // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");

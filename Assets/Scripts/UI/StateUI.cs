@@ -65,5 +65,4 @@ public class StateUI : MonoBehaviour
             return value.ToString();
     }
 
-
 }

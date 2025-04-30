@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum AttackType
@@ -21,6 +22,8 @@ public class Player : MonoBehaviour
 {
     UnitStats stats = new UnitStats("User", 1000, 10, 5, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
+
+    List<UnitStats> _petStats = new();
 
     [SerializeField] SPUM_Prefabs animCtrl;
 
@@ -82,5 +85,9 @@ public class Player : MonoBehaviour
 
         return value;
     }
-
+    //펫들 스테이터스 반환
+    public List<UnitStats> GetPetStats()
+    {
+        return _petStats;
+    }
 }
