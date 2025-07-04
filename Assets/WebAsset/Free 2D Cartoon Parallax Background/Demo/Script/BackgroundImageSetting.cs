@@ -1,15 +1,26 @@
 using UnityEngine;
 
-//레이어 오브젝트의 스프라이트를 변경하는 스크립트
-public class BackgroundControl_0 : MonoBehaviour
+public enum BackgroundType 
 {
-    [Header("BackgroundNum 0 -> 3")]
-    public int backgroundNum; //현재 적용된 배경종류
+    BG_Forest,
+    BG_Desert,
+    BG_NetherWood,
+    BG_WinterWood
+}
+
+//레이어 오브젝트의 스프라이트를 변경하는 스크립트
+public class BackgroundImageSetting : MonoBehaviour
+{
+    //현재 적용된 배경종류
+    [Header("BackgroundType 0 -> 3")] public BackgroundType backgroundType = BackgroundType.BG_Forest;
+
+    private int backgroundNum;
     public Sprite[] Layer_Sprites; // 배경종류 전체 스프라이트
     private GameObject[] Layer_Object = new GameObject[5];//레이어 받을 오브젝트 
     private int max_backgroundNum = 3; // 배경종류 최대값
     void Start()
     {
+        backgroundNum = (int)backgroundType;
         //배경종류 0~3까지의 스프라이트를 Layer_Sprites에 넣어주고,
         //Layer_Object에 레이어 오브젝트를 넣어준다.
         for (int i = 0; i < Layer_Object.Length; i++)

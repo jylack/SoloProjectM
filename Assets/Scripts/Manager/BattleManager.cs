@@ -18,7 +18,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private float attackDelay = 0.5f;
 
-    [SerializeField] private ParallaxBackground_0 parallaxBackground;
+    [SerializeField] private ParallaxBackground parallaxBackground;
 
     private UnitStats currentAttacker;
     private UnitStats currentDefender;
@@ -61,7 +61,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(attackDelay);
 
         // 연출: 배경 카메라 이동중지
-        parallaxBackground.Camera_Move = false;
+        parallaxBackground.cameraMove = false;
         player.SetAnim(PlayerState.IDLE);
 
         //아래부터 전투
@@ -166,7 +166,7 @@ public class BattleManager : MonoBehaviour
                 yield return new WaitForSeconds(1f);
 
                 //배경 카메라 이동시작
-                parallaxBackground.Camera_Move = true;
+                parallaxBackground.cameraMove = true;
                 yield break;
             }
 
