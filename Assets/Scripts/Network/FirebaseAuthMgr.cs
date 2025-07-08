@@ -189,4 +189,9 @@ public class FirebaseAuthMgr : MonoBehaviour
             }
         }
     }
+
+    public void TestLogin()
+    {
+        GameManager.instance.SceneLoad(SceneName.RoomScene);
+    }
 }

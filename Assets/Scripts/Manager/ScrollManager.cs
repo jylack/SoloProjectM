@@ -1,4 +1,5 @@
 
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -7,16 +8,14 @@ public class ScrollManager : MonoBehaviour
 {
     [SerializeField] private Scrollbar scrollbar;
     [SerializeField] private Transform contentTr;
-    [SerializeField] private Slider tabSlider;
     [SerializeField] private RectTransform[] BtnRect;
     [SerializeField] private RectTransform[] BtnImageRect;
 
     private TouchControls controls;
     private Vector2 startPos, endPos;
-    //private bool isTouching;
     private bool isDragging;
 
-    private const int SIZE = 4;
+    private const int SIZE = 5;
     private float[] pos = new float[SIZE];
     private float distance;
     private float targetPos;
@@ -43,13 +42,20 @@ public class ScrollManager : MonoBehaviour
 
     private void Start()
     {
+        scrollbar.value = 0.5f; // 초기값 설정
+        targetIndex = 2; // 초기 타겟 인덱스 설정
+        targetPos = scrollbar.value; // 초기 타겟 위치 설정
+
         distance = 1f / (SIZE - 1);
-        for (int i = 0; i < SIZE; i++) pos[i] = distance * i;
+        
+        for (int i = 0; i < SIZE; i++)
+        {
+            pos[i] = distance * i;
+        }
     }
 
     private void OnTouchStart(InputAction.CallbackContext ctx)
     {
-        // isTouching = true;
         isDragging = true;
         startPos = controls.Touch.PrimaryPosition.ReadValue<Vector2>();
         targetPos = GetNearestPos(scrollbar.value);
@@ -78,7 +84,6 @@ public class ScrollManager : MonoBehaviour
                 sb.value = 1;
         }
 
-        //  isTouching = false;
     }
 
     private float GetNearestPos(float val)
@@ -96,16 +101,9 @@ public class ScrollManager : MonoBehaviour
 
     private void Update()
     {
-        tabSlider.value = scrollbar.value;
-
         if (!isDragging)
         {
             scrollbar.value = Mathf.Lerp(scrollbar.value, targetPos, 0.1f);
-
-            for (int i = 0; i < SIZE; i++)
-            {
-                BtnRect[i].sizeDelta = new Vector2(i == targetIndex ? 360 : 180, BtnRect[i].sizeDelta.y);
-            }
         }
 
         for (int i = 0; i < SIZE; i++)
@@ -116,12 +114,23 @@ public class ScrollManager : MonoBehaviour
 
             if (i == targetIndex)
             {
-                BtnTargetPos.y = -23f;
+                BtnTargetPos.y = 100f;
                 BtnTargetScale = new Vector3(1.2f, 1.2f, 1f);
                 textActive = true;
+                BtnRect[i].localScale = BtnTargetScale;
+                BtnImageRect[i].anchoredPosition3D =
+                Vector3.Lerp(Vector3.zero,
+                            new Vector3(0, BtnTargetPos.y, 0),
+                            0.25f);
+            }
+            else
+            {
+                BtnTargetPos.y = 0f;
+                BtnImageRect[i].anchoredPosition3D = Vector3.zero;
+                BtnRect[i].localScale = Vector3.one;
             }
 
-            BtnImageRect[i].anchoredPosition3D = Vector3.Lerp(BtnImageRect[i].anchoredPosition3D, BtnTargetPos, 0.25f);
+
             BtnImageRect[i].localScale = Vector3.Lerp(BtnImageRect[i].localScale, BtnTargetScale, 0.25f);
             BtnImageRect[i].transform.GetChild(0).gameObject.SetActive(textActive);
         }
@@ -132,5 +141,6 @@ public class ScrollManager : MonoBehaviour
         targetIndex = n;
         targetPos = pos[n];
     }
+
 }
 

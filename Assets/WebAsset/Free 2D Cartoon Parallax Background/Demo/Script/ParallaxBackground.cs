@@ -58,75 +58,75 @@ public class ParallaxBackground : MonoBehaviour
     //    }
     //}
 
-    //void Update()
-    //{
-    //    // 카메라 이동
-    //    if (Camera_Move)
-    //    {
-    //        _camera.position += Vector3.right * Time.deltaTime * Camera_MoveSpeed;
-    //    }
-
-    //    // 각 레이어 위치 갱신
-    //    for (int i = 0; i < 5; i++)
-    //    {
-    //        // 카메라와 레이어 속도의 차이값 (보정값)
-    //        float temp = _camera.position.x * (1 - Layer_Speed[i]);
-
-    //        // 카메라 이동에 따라 계산된 레이어 위치
-    //        float distance = _camera.position.x * Layer_Speed[i];
-
-    //        // 레이어의 위치 갱신 (카메라 Y는 그대로)
-    //        Layer_Objects[i].transform.position = new Vector2(startPos[i].x + distance, startPos[i].y);
-
-    //        //boundSizeX * sizeX = 레이어의 가로 길이
-    //        // 오른쪽으로 넘어갔을 경우 → 시작 위치를 오른쪽으로 한 칸 이동
-    //        if (temp > startPos[i].x + boundSizeX * sizeX)
-    //        {
-    //            startPos[i].x += boundSizeX * sizeX;
-    //        }
-    //        // 왼쪽으로 넘어갔을 경우 → 시작 위치를 왼쪽으로 한 칸 이동
-    //        else if (temp < startPos[i].x - boundSizeX * sizeX)
-    //        {
-    //            startPos[i].x -= boundSizeX * sizeX;
-    //        }
-    //    }
-    //}
-
     void Update()
     {
-        // 1) 카메라 자동 이동
+        // 카메라 이동
         if (cameraMove)
-            _camera.position += Vector3.right * cameraMoveSpeed * Time.deltaTime;
-
-        float camX = _camera.position.x;
-
-        // 2) 각 레이어 패럴랙스 및 재배치
-        for (int i = 0; i < layerObjects.Length; i++)
         {
-            float speed = layerSpeed[i];
-            var obj = layerObjects[i];
-            Vector3 startPos = startPositions[i];
+            _camera.position += Vector3.right * Time.deltaTime * cameraMoveSpeed;
+        }
 
-            // 패럴랙스 오프셋 계산
-            float offsetX = (camX - startPos.x) * speed;
-            float newX = startPos.x + offsetX;
+        // 각 레이어 위치 갱신
+        for (int i = 0; i < 5; i++)
+        {
+            // 카메라와 레이어 속도의 차이값 (보정값)
+            float temp = _camera.position.x * (1 - layerSpeed[i]);
 
-            // Z 축 보존
-            float zPos = obj.transform.position.z;
-            obj.transform.position = new Vector3(newX, startPos.y, zPos);
+            // 카메라 이동에 따라 계산된 레이어 위치
+            float distance = _camera.position.x * layerSpeed[i];
 
-            // 일정 범위를 벗어나면 타일 재배치
-            float temp = camX * (1 - speed);
-            float tileWidth = layerWidths[i];
-            if (temp > startPos.x + tileWidth)
+            // 레이어의 위치 갱신 (카메라 Y는 그대로)
+            layerObjects[i].transform.position = new Vector2(startPositions[i].x + distance, startPositions[i].y);
+
+            //boundSizeX * sizeX = 레이어의 가로 길이
+            // 오른쪽으로 넘어갔을 경우 → 시작 위치를 오른쪽으로 한 칸 이동
+            if (temp > startPositions[i].x + boundSizeX * sizeX)
             {
-                startPositions[i].x += tileWidth;
+                startPositions[i].x += boundSizeX * sizeX;
             }
-            else if (temp < startPos.x - tileWidth)
+            // 왼쪽으로 넘어갔을 경우 → 시작 위치를 왼쪽으로 한 칸 이동
+            else if (temp < startPositions[i].x - boundSizeX * sizeX)
             {
-                startPositions[i].x -= tileWidth;
+                startPositions[i].x -= boundSizeX * sizeX;
             }
         }
     }
+
+    //void Update()
+    //{
+    //    // 1) 카메라 자동 이동
+    //    if (cameraMove)
+    //        _camera.position += Vector3.right * cameraMoveSpeed * Time.deltaTime;
+
+    //    float camX = _camera.position.x;
+
+    //    // 2) 각 레이어 패럴랙스 및 재배치
+    //    for (int i = 0; i < layerObjects.Length; i++)
+    //    {
+    //        float speed = layerSpeed[i];
+    //        var obj = layerObjects[i];
+    //        Vector3 startPos = startPositions[i];
+
+    //        // 패럴랙스 오프셋 계산
+    //        float offsetX = (camX - startPos.x) * speed;
+    //        float newX = startPos.x + offsetX;
+
+    //        // Z 축 보존
+    //        float zPos = obj.transform.position.z;
+    //        obj.transform.position = new Vector3(newX, startPos.y, zPos);
+
+    //        // 일정 범위를 벗어나면 타일 재배치
+    //        float temp = camX * (1 - speed);
+    //        float tileWidth = layerWidths[i];
+    //        if (temp > startPos.x + tileWidth)
+    //        {
+    //            startPositions[i].x += tileWidth;
+    //        }
+    //        else if (temp < startPos.x - tileWidth)
+    //        {
+    //            startPositions[i].x -= tileWidth;
+    //        }
+    //    }
+    //}
 
 }
