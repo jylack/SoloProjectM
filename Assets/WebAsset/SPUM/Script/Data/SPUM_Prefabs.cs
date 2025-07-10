@@ -56,7 +56,7 @@ public class SPUM_Prefabs : MonoBehaviour
 
         foreach (AnimationClip clip in clips)
         {
-            // 복제된 클립으로 오버라이드합니다
+            // 복제된 클립으로 오버라이드합니다;
             OverrideController[clip.name] = clip;
         }
 
