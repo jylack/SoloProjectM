@@ -54,8 +54,8 @@ public class BattleManager : MonoBehaviour
         // 전투 시작 로그
         _logUI.AddDayLog(GameManager.Instance.CurrentDay, "전투 시작!");
 
-        Debug.Log("??");
-        // 연출: 플레이어/몬스터 접근
+
+        // 연출 플레이어/몬스터 접근
         yield return MoveOverTime(playerTransform, playerTransform.position,
                                  playerTransform.position + Vector3.right * 1f, moveDuration);
 

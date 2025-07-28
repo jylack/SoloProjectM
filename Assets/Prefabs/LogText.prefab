@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8308378178201202352}
   - component: {fileID: 1089129057707007590}
   - component: {fileID: 2176845368303040396}
+  - component: {fileID: 2170636936886065017}
   m_Layer: 5
   m_Name: LogImg
   m_TagString: Untagged
@@ -76,6 +77,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2170636936886065017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513241601992053111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &583424123520155834
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,6 +376,7 @@ GameObject:
   - component: {fileID: 5177915883145878411}
   - component: {fileID: 3573311980234985424}
   - component: {fileID: 5725475567292837079}
+  - component: {fileID: 437400215630068327}
   m_Layer: 5
   m_Name: LogText
   m_TagString: Untagged
@@ -421,3 +443,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &437400215630068327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8710607814791840496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38af8951181f5fa419e11c8dbc5489c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayText: {fileID: 3020259219328804569}
+  messageText: {fileID: 4240996732259200036}
+  background: {fileID: 8308378178201202352}

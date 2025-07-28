@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -7,11 +8,11 @@ public class UIManager : MonoBehaviour
 
     [Header("플레이어 UI")]
     [SerializeField] private Slider playerHpBar;
-    [SerializeField] private Text playerHpText;
+    [SerializeField] private TextMeshProUGUI playerHpText;
 
     [Header("몬스터 UI")]
     [SerializeField] private Slider monsterHpBar;
-    [SerializeField] private Text monsterHpText;
+    [SerializeField] private TextMeshProUGUI monsterHpText;
 
     private void Awake()
     {

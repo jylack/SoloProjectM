@@ -24,6 +24,11 @@ public class Player : MonoBehaviour
 
     [SerializeField] SPUM_Prefabs animCtrl;
 
+    private void Awake()
+    {
+        AnimSetting();
+    }
+
     public void AnimSetting()
     {
         //// 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
@@ -87,6 +92,6 @@ public class Player : MonoBehaviour
     /// <returns>ICombatant 타입으로 UnitStats 반환</returns>
     public ICombatant GetCombatStats()
     {
-        return unitStats;
+        return GetStats();
     }
 }
