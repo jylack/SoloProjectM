@@ -12,17 +12,17 @@ public enum SceneName
 public class GameManager : MonoBehaviour
 {
 
-    public static GameManager instance;
+    public static GameManager Instance { get; set; }
 
     public Player PlayerState;
 
-    public int currentDay = 1; // 현재 날짜
+    public int CurrentDay = 1; // 현재 날짜
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -35,7 +35,6 @@ public class GameManager : MonoBehaviour
     {
         return PlayerState;
     }
-
 
     public void SceneLoad(SceneName sceneName)
     {

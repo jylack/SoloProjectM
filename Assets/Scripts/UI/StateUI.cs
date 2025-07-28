@@ -21,11 +21,11 @@ public class StateUI : MonoBehaviour
 
     IEnumerator PlayerSetting()
     {
-        yield return new WaitUntil(() => GameManager.instance.GetPlayer() != null); // 전투 시작 대기
+        yield return new WaitUntil(() => GameManager.Instance.GetPlayer() != null); // 전투 시작 대기
         //모든 추가능력치 다 합쳐진거 호출
-        player = GameManager.instance.GetPlayer().GetStats();
+        player = GameManager.Instance.GetPlayer().GetStats();
 
-        LvlText.text =  "LV." + player.Lvl.ToString();
+        LvlText.text =  "LV." + player.Lv.ToString();
         HpText.text = player.CurrentHp.ToString() +"/" + player.MaxHp.ToString();
         AtkText.text = player.Attack.ToString();
         DefText.text = player.Defense.ToString();

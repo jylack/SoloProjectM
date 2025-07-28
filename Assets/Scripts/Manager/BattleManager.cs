@@ -1,153 +1,115 @@
+// BattleManager.cs
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(LogUI))]
 public class BattleManager : MonoBehaviour
 {
-    private UnitStats playerStats;
-    private UnitStats monsterStats;
-
-    [SerializeField] private LogUI battleLogUI;
-
+    [Header("Refs")]
     [SerializeField] private Transform playerTransform;
-    Player player;
-
     [SerializeField] private Transform monsterTransform;
-    Monster monster;
+    [SerializeField] private ParallaxBackground parallaxBackground;
 
+    [Header("Timing")]
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private float attackDelay = 0.5f;
 
-    [SerializeField] private ParallaxBackground parallaxBackground;
+    private LogUI _logUI;
+    private Player _player;
+    private Monster _monster;
+    private ICombatant _playerStats;
+    private ICombatant _monsterStats;
+    private Queue<ICombatant> _turnQueue;
 
-    private UnitStats currentAttacker;
-    private UnitStats currentDefender;
-
-    private Queue<ICombatant> turnQueue;
-    private void InitTurnQueue()
+    private void Awake()
     {
-        var list = new List<ICombatant> { playerStats, monsterStats };
-        list = list.OrderByDescending(u => u.Speed).ToList();
-        turnQueue = new Queue<ICombatant>(list);
+        _logUI = GetComponent<LogUI>();
     }
 
     private void OnEnable()
     {
-        player = playerTransform.GetComponent<Player>();
-        playerStats = player.GetStats();
-        player.AnimSetting();
+        // 컴포넌트 & 스탯 초기화
+        _player = playerTransform.GetComponent<Player>();
+        _monster = monsterTransform.GetComponent<Monster>();
+        _playerStats = _player.GetStats();
+        _monsterStats = _monster.GetStats();
 
-        monster = monsterTransform.GetComponent<Monster>();
-        monsterStats = monster.GetStats();
+        // HP 변경 UI 바인딩 예시
+        _playerStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdatePlayerHp(cur, max);
+        _monsterStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdateMonsterHp(cur, max);
 
-        player.SetAnim(PlayerState.MOVE);
-        monster.SetAnim(MonsterState.MOVE);
-
-        StartCoroutine(StartBattle());
+        StartCoroutine(StartBattleSequence());
     }
 
-    private IEnumerator StartBattle()
+    private IEnumerator StartBattleSequence()
     {
-        yield return new WaitUntil(() => GameManager.instance != null); // 전투 시작 대기
-        battleLogUI.AddDayLog(GameManager.instance.currentDay, "전투 시작!");
+        // 전투 시작 로그
+        _logUI.AddDayLog(GameManager.Instance.CurrentDay, "전투 시작!");
 
+        // 연출: 플레이어/몬스터 접근
+        yield return MoveOverTime(playerTransform, playerTransform.position,
+                                 playerTransform.position + Vector3.right * 1f, moveDuration);
 
-        // 연출: 플레이어 왼쪽으로 이동
-        Vector3 playerStart = playerTransform.position;
-        Vector3 playerTarget = playerStart + new Vector3(1f, 0, 0);
-        yield return MoveOverTime(playerTransform, playerStart, playerTarget, moveDuration);
-
-        // 연출: 몬스터 오른쪽 바깥에서 등장
-        Vector3 monsterStart = monsterTransform.position + Vector3.right * 2.5f;
-        monsterTransform.position = monsterStart;
-        Vector3 monsterTarget = monsterStart + Vector3.left * 3.5f;
-        yield return MoveOverTime(monsterTransform, monsterStart, monsterTarget, moveDuration);
+        var monsterStart = monsterTransform.position + Vector3.right * 2.5f;
+        yield return MoveOverTime(monsterTransform, monsterStart,
+                                 monsterStart + Vector3.left * 3.5f, moveDuration);
 
         yield return new WaitForSeconds(attackDelay);
-
-        // 연출: 배경 카메라 이동중지
         parallaxBackground.cameraMove = false;
-        player.SetAnim(PlayerState.IDLE);
 
-        //아래부터 전투
-        DecideFirstTurn();
-
-        yield return StartCoroutine(CombatLoop());
+        // 턴 큐 초기화 & 전투 루프 시작
+        InitTurnQueue();
+        StartCoroutine(CombatLoop());
     }
 
-    //누가 먼저 싸울꺼냐!
-    private void DecideFirstTurn()
+    private void InitTurnQueue()
     {
-        if (playerStats.Speed > monsterStats.Speed)
-        {
-            currentAttacker = playerStats;
-            currentDefender = monsterStats;
-        }
-        else if (playerStats.Speed < monsterStats.Speed)
-        {
-            currentAttacker = monsterStats;
-            currentDefender = playerStats;
-        }
-        else
-        {
-            // 속도가 같으면 랜덤으로 결정
-            if (Random.value < 0.5f)
-            {
-                currentAttacker = playerStats;
-                currentDefender = monsterStats;
-            }
-            else
-            {
-                currentAttacker = monsterStats;
-                currentDefender = playerStats;
-            }
-        }
-
-        //battleLogUI.AddLog(currentAttacker.Name + "이(가) 먼저 공격합니다!");
+        // 속도 내림차순 정렬 후 큐에 넣기
+        var ordered = new List<ICombatant> { _playerStats, _monsterStats }
+                      .OrderByDescending(u => u.Speed);
+        _turnQueue = new Queue<ICombatant>(ordered);
     }
 
     private IEnumerator CombatLoop()
     {
-        while (turnQueue.Count > 0)
+        while (_turnQueue.Count > 0)
         {
-            var actor = turnQueue.Dequeue();
-            var defender = (actor == playerStats) ? (ICombatant)monsterStats : playerStats;
+            var actor = _turnQueue.Dequeue();
+            var defender = actor == _playerStats ? _monsterStats : _playerStats;
 
-            if (actor.IsDead) continue;
+            if (actor.IsDead)
+                continue;
 
             actor.ResetActions();
 
-            // 행동 가능 횟수만큼 반복
-            while (actor.CurrentActions > 0 && !defender.IsDead)
+            // 남은 행동만큼 반복
+            while (actor.ActionsRemaining > 0 && !defender.IsDead)
             {
-                // 애니메이션 세팅
-                if (actor == playerStats) player.SetAnim(PlayerState.ATTACK);
-                else monster.SetAnim(MonsterState.ATK1);
-                if (defender == playerStats) player.SetAnim(PlayerState.DAMAGED);
-                else monster.SetAnim(MonsterState.DAMAGE);
+                // 공격 애니메이션
+                if (actor == _playerStats) _player.SetAnim(PlayerState.ATTACK);
+                else _monster.SetAnim(MonsterState.Atk1);
 
-                // 데미지 적용
+                // 피해 적용
                 defender.TakeDamage(actor.Attack);
-                battleLogUI.AddLog($"{actor.Name} → {defender.Name} : {actor.Attack} 피해");
+                _logUI.AddLog($"{actor.Name} → {defender.Name} : {actor.Attack} 피해");
 
-                // 사망 체크
-                if (defender.IsDead) break;
-
-                actor.CurrentActions--;
+                actor.ActionsRemaining--;
                 yield return new WaitForSeconds(attackDelay);
             }
 
-            // 승패 판단
-            if (monsterStats.IsDead || playerStats.IsDead)
+            // 사망 처리
+            if (defender.IsDead)
             {
                 yield return HandleDeath(defender);
                 yield break;
             }
 
-            // 남아있으면 다시 큐에
-            if (!actor.IsDead) turnQueue.Enqueue(actor);
+            // 다시 큐에 넣기
+            if (!actor.IsDead)
+                _turnQueue.Enqueue(actor);
 
             yield return new WaitForSeconds(attackDelay);
         }
@@ -155,35 +117,32 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator HandleDeath(ICombatant fallen)
     {
-        if (fallen == playerStats)
+        if (fallen == _playerStats)
         {
-            player.SetAnim(PlayerState.DEATH);
-            battleLogUI.AddLog("YOU DIE");
+            _player.SetAnim(PlayerState.DEATH);
+            _logUI.AddLog("YOU DIED");
             yield return new WaitForSeconds(1f);
-            SceneManager.LoadScene("RoomScene");
+            SceneManager.LoadScene(nameof(SceneNames.RoomScene));
         }
         else
         {
-            monster.SetAnim(MonsterState.DEATH);
-            battleLogUI.AddLog($"{fallen.Name} 처치!");
+            _monster.SetAnim(MonsterState.Death);
+            _logUI.AddLog($"{fallen.Name} 처치!");
             yield return new WaitForSeconds(1f);
             Destroy(monsterTransform.GetChild(0).gameObject, 1f);
             parallaxBackground.cameraMove = true;
         }
     }
 
-
-    //무빙 무빙 
-    private IEnumerator MoveOverTime(Transform target, Vector3 from, Vector3 to, float duration)
+    private IEnumerator MoveOverTime(Transform t, Vector3 from, Vector3 to, float duration)
     {
         float elapsed = 0f;
-
         while (elapsed < duration)
         {
-            target.position = Vector3.Lerp(from, to, elapsed / duration);
+            t.position = Vector3.Lerp(from, to, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
-        target.position = to;
+        t.position = to;
     }
 }

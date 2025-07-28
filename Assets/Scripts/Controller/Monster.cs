@@ -1,50 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public enum MonsterState
 {
-    IDLE,
-    ATK1,
-    ATK2,
-    DAMAGE,
-    MOVE,
-    DEATH,    
+    Idle,
+    Atk1,
+    Atk2,
+    Hit,
+    Run,
+    Death,    
 }
 
+[RequireComponent(typeof(Animator))]
 public class Monster : MonoBehaviour
 {
+    [Header("스텟")]
     string Name;
-    UnitStats stats = new UnitStats("Monster", 100, 10, 5, 1);
+    UnitStats unitStats = new UnitStats("Monster", 100, 10, 5, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
 
-    [SerializeField] Animator animCtrl;
+    Animator animator;
 
-
-    //기본 애니메이션 세팅
-    public void SetAnim(MonsterState state)
+    private void Awake()
     {
-        switch (state)
-        {
-            case MonsterState.IDLE:
-                animCtrl.SetTrigger("Idle");
-                break;
-            case MonsterState.ATK1:
-                animCtrl.SetTrigger("Atk1");
-                break;
-            case MonsterState.ATK2:
-                animCtrl.SetTrigger("Atk2");
-                break;
-            case MonsterState.DAMAGE:
-                animCtrl.SetTrigger("Hit");
-                break;
-            case MonsterState.MOVE:
-                animCtrl.SetTrigger("Run");
-                break;
-            case MonsterState.DEATH:
-                animCtrl.SetTrigger("Death");
-                break;
-        }
+        animator = GetComponent<Animator>();
     }
 
     //추가 스탯 적용
@@ -55,19 +36,39 @@ public class Monster : MonoBehaviour
     //원본스텟 반환
     public UnitStats GetOriginStats()
     {
-        return stats;
+        return unitStats;
     }
     //적용된 스텟 반환
     public UnitStats GetApplyState()
     {
         return ApplyState;
     }
+
+
     //적용된 스텟과 원본스텟을 합쳐서 반환
     public UnitStats GetStats()
     {
-        UnitStats value = new UnitStats(stats.Name, stats.MaxHp + ApplyState.MaxHp, stats.Attack + ApplyState.Attack, stats.Speed + ApplyState.Speed, stats.AttackCount + ApplyState.AttackCount);
+        UnitStats value = new UnitStats(unitStats.Name, unitStats.MaxHp + ApplyState.MaxHp, unitStats.Attack + ApplyState.Attack, unitStats.Speed + ApplyState.Speed, unitStats.MaxActionsPerTurn + ApplyState.MaxActionsPerTurn);
 
         return value;
+    }
+
+    /// <summary>
+    /// 지정된 상태에 해당하는 애니메이션 트리거를 실행합니다.
+    /// </summary>
+    /// <param name="state">실행할 몬스터 상태</param>
+    public void SetAnim(MonsterState state)
+    {
+        animator.SetTrigger(state.ToString());
+    }
+
+    /// <summary>
+    /// 전투 시스템에서 사용할 스탯 인터페이스를 반환합니다.
+    /// </summary>
+    /// <returns>ICombatant 타입으로 UnitStats 반환</returns>
+    public ICombatant GetCombatStats()
+    {
+        return unitStats;
     }
 
 }

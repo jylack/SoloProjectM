@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public enum AttackType
@@ -16,15 +17,13 @@ public enum OtherType
     Buff,
     Sit
 }
-
 public class Player : MonoBehaviour
 {
-    UnitStats stats = new UnitStats("User", 1000, 10, 5, 1);
+    UnitStats unitStats = new UnitStats("User", 1000, 10, 5, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
 
     [SerializeField] SPUM_Prefabs animCtrl;
 
-  
     public void AnimSetting()
     {
         //// 1) 에셋 안의 AnimationData 리스트를 state별 리스트로 채우고
@@ -66,7 +65,7 @@ public class Player : MonoBehaviour
     //원본스텟 반환
     public UnitStats GetOriginStats()
     {
-        return stats;
+        return unitStats;
     }
     //적용된 스텟 반환
     public UnitStats GetApplyState()
@@ -76,9 +75,18 @@ public class Player : MonoBehaviour
     //적용된 스텟과 원본스텟을 합쳐서 반환
     public UnitStats GetStats()
     {
-        UnitStats value = new UnitStats(stats.Name, stats.MaxHp + ApplyState.MaxHp, stats.Attack + ApplyState.Attack, stats.Speed + ApplyState.Speed, stats.AttackCount + ApplyState.AttackCount);
+        UnitStats value = new UnitStats(unitStats.Name, unitStats.MaxHp + ApplyState.MaxHp, unitStats.Attack + ApplyState.Attack, unitStats.Speed + ApplyState.Speed, unitStats.MaxActionsPerTurn + ApplyState.MaxActionsPerTurn);
+
 
         return value;
     }
 
+    /// <summary>
+    /// 전투 시스템에서 사용할 스탯 인터페이스를 반환합니다.
+    /// </summary>
+    /// <returns>ICombatant 타입으로 UnitStats 반환</returns>
+    public ICombatant GetCombatStats()
+    {
+        return unitStats;
+    }
 }
