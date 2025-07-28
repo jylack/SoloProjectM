@@ -4,22 +4,22 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// ½ºÅ×ÀÌÁöº° ÃÖ´ë ÀÏ¼ö¸¦ °ü¸®ÇÏ°í
-/// ÇöÀç ½ºÅ×ÀÌÁö¡¤ÀÏÀ» ÁøÇà½ÃÅ°´Â ½Ì±ÛÅæ ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ìŠ¤í…Œì´ì§€ë³„ ìµœëŒ€ ì¼ìˆ˜ë¥¼ ê´€ë¦¬í•˜ê³ 
+/// í˜„ì¬ ìŠ¤í…Œì´ì§€Â·ì¼ì„ ì§„í–‰ì‹œí‚¤ëŠ” ì‹±ê¸€í†¤ ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// </summary>
 public class StageManager : MonoBehaviour
 {
     public static StageManager Instance { get; private set; }
 
-    [Header("½ºÅ×ÀÌÁöº° ÃÖ´ë ÀÏ¼ö ¼³Á¤")]
+    [Header("ìŠ¤í…Œì´ì§€ë³„ ìµœëŒ€ ì¼ìˆ˜ ì„¤ì •")]
     [SerializeField] private int stage1Days = 10;
     [SerializeField] private int stage2Days = 30;
-    // ÇÊ¿äÇÏ¸é 3½ºÅ×ÀÌÁö ÀÌÈÄµµ ¿©±â Ãß°¡
+    // í•„ìš”í•˜ë©´ 3ìŠ¤í…Œì´ì§€ ì´í›„ë„ ì—¬ê¸° ì¶”ê°€
 
     public int CurrentStage { get; private set; } = 1;
     public int CurrentDay { get; private set; } = 1;
 
-    // ½ºÅ×ÀÌÁö¡¤ÀÏÀÌ ¹Ù²ğ ¶§ È£ÃâµÇ´Â ÀÌº¥Æ®
+    // ìŠ¤í…Œì´ì§€Â·ì¼ì´ ë°”ë€” ë•Œ í˜¸ì¶œë˜ëŠ” ì´ë²¤íŠ¸
     //  stage ,day
     public UnityEvent<int, int > OnStageDayChanged;
 
@@ -31,24 +31,24 @@ public class StageManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // ½ºÅ×ÀÌÁöº° ÀÏ¼ö ¸ÅÇÎ ÃÊ±âÈ­
+        // ìŠ¤í…Œì´ì§€ë³„ ì¼ìˆ˜ ë§¤í•‘ ì´ˆê¸°í™”
         _stageDurations = new Dictionary<int, int>()
         {
             { 1, stage1Days },
             { 2, stage2Days },
         };
-        // ÃÊ±â ÀÌº¥Æ® ¹ßµ¿
+        // ì´ˆê¸° ì´ë²¤íŠ¸ ë°œë™
         OnStageDayChanged?.Invoke(CurrentStage, CurrentDay);
     }
 
     /// <summary>
-    /// ÇÏ·ç¸¦ ³Ñ±â°í, ¸¸¾à ½ºÅ×ÀÌÁö ÃÖ´ëÀÏ¼ö¸¦ ÃÊ°úÇÏ¸é ´ÙÀ½ ½ºÅ×ÀÌÁö·Î ³Ñ¾î°©´Ï´Ù.
+    /// í•˜ë£¨ë¥¼ ë„˜ê¸°ê³ , ë§Œì•½ ìŠ¤í…Œì´ì§€ ìµœëŒ€ì¼ìˆ˜ë¥¼ ì´ˆê³¼í•˜ë©´ ë‹¤ìŒ ìŠ¤í…Œì´ì§€ë¡œ ë„˜ì–´ê°‘ë‹ˆë‹¤.
     /// </summary>
     public void AdvanceDay()
     {
         CurrentDay++;
 
-        // ÇöÀç ½ºÅ×ÀÌÁö°¡ µñ¼Å³Ê¸®¿¡ ÀÖ°í, ÃÖ´ëÀÏ¼öº¸´Ù ÃÊ°úÇßÀ¸¸é
+        // í˜„ì¬ ìŠ¤í…Œì´ì§€ê°€ ë”•ì…”ë„ˆë¦¬ì— ìˆê³ , ìµœëŒ€ì¼ìˆ˜ë³´ë‹¤ ì´ˆê³¼í–ˆìœ¼ë©´
         if (_stageDurations.TryGetValue(CurrentStage, out var maxDay)
             && CurrentDay > maxDay)
         {
@@ -58,4 +58,17 @@ public class StageManager : MonoBehaviour
 
         OnStageDayChanged?.Invoke(CurrentStage, CurrentDay);
     }
+
+    public void ForceStage(int stageId)
+    {
+        CurrentStage = stageId;
+        CurrentDay = 1;
+        PushStageDay();
+    }
+
+    private void PushStageDay()
+    {
+        OnStageDayChanged?.Invoke(CurrentStage, CurrentDay);
+    }
+
 }

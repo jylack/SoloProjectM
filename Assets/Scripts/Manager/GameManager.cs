@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public enum SceneName
@@ -16,7 +14,7 @@ public class GameManager : MonoBehaviour
 
     public Player PlayerState;
 
-    public int CurrentDay = 1; // ÇöÀç ³¯Â¥
+    public int CurrentDay = 1; // í˜„ìž¬ ë‚ ì§œ
 
     private void Awake()
     {
@@ -28,7 +26,7 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-        }                
+        }
     }
 
     public Player GetPlayer()
