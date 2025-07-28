@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,8 +25,13 @@ public class BattleManager : MonoBehaviour
     private UnitStats currentAttacker;
     private UnitStats currentDefender;
 
-
-
+    private Queue<ICombatant> turnQueue;
+    private void InitTurnQueue()
+    {
+        var list = new List<ICombatant> { playerStats, monsterStats };
+        list = list.OrderByDescending(u => u.Speed).ToList();
+        turnQueue = new Queue<ICombatant>(list);
+    }
 
     private void OnEnable()
     {
@@ -103,81 +110,68 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator CombatLoop()
     {
-        //누군가 죽을때까지 싸운다.
-        while (!playerStats.IsDead && !monsterStats.IsDead)
+        while (turnQueue.Count > 0)
         {
-            //공격자가 공격횟수만큼 공격
-            for (int i = 0; i < currentAttacker.AttackCount; i++)
+            var actor = turnQueue.Dequeue();
+            var defender = (actor == playerStats) ? (ICombatant)monsterStats : playerStats;
+
+            if (actor.IsDead) continue;
+
+            actor.ResetActions();
+
+            // 행동 가능 횟수만큼 반복
+            while (actor.CurrentActions > 0 && !defender.IsDead)
             {
+                // 애니메이션 세팅
+                if (actor == playerStats) player.SetAnim(PlayerState.ATTACK);
+                else monster.SetAnim(MonsterState.ATK1);
+                if (defender == playerStats) player.SetAnim(PlayerState.DAMAGED);
+                else monster.SetAnim(MonsterState.DAMAGE);
 
-                if (currentAttacker == playerStats)
-                {
-                    player.SetAnim(PlayerState.ATTACK);
-                }
-                else if (currentAttacker == monsterStats)
-                {
-                    monster.SetAnim(MonsterState.ATK1);
-                }
+                // 데미지 적용
+                defender.TakeDamage(actor.Attack);
+                battleLogUI.AddLog($"{actor.Name} → {defender.Name} : {actor.Attack} 피해");
 
-                if (currentDefender == playerStats)
-                {
-                    player.SetAnim(PlayerState.DAMAGED);
-                }
-                else if (currentDefender == monsterStats)
-                {
-                    monster.SetAnim(MonsterState.DAMAGE);
-                }
+                // 사망 체크
+                if (defender.IsDead) break;
 
-                currentDefender.TakeDamage(currentAttacker.Attack);
-
-
-                // battleLogUI.AddLog(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다! ");
-                //Debug.Log(currentAttacker.Name + "의 공격! " + currentDefender.Name + "에게 " + currentAttacker.Attack + "의 피해를 입혔습니다!");
-
-                //방어자 죽었는가 판별
-                if (currentDefender.IsDead) break;
-
-
-                //공격 딜레이 이걸 나중에 애니메이션 속도랑 동기화해줄예정임 //각애니메이션마다 길이가 다름.
+                actor.CurrentActions--;
                 yield return new WaitForSeconds(attackDelay);
             }
 
-            //방어자가 죽었는가 판별
-            if (currentDefender.IsDead)
+            // 승패 판단
+            if (monsterStats.IsDead || playerStats.IsDead)
             {
-
-                if (currentDefender == playerStats)
-                {
-                    player.SetAnim(PlayerState.DEATH);
-                    //Debug.Log("Player is dead");
-                    battleLogUI.AddLog("YOU DIE");
-                    yield return new WaitForSeconds(1f);
-                    SceneManager.LoadScene(SceneName.RoomScene.ToString());
-                }
-                else
-                {
-                    monster.SetAnim(MonsterState.DEATH);
-                    battleLogUI.AddLog(currentDefender.Name + "를 처치했다!");
-                    player.SetAnim(PlayerState.MOVE);
-                    //Debug.Log("Monster is dead");
-                    Destroy(monsterTransform.GetChild(0).gameObject, 1f);
-                }
-
-                yield return new WaitForSeconds(1f);
-
-                //배경 카메라 이동시작
-                parallaxBackground.cameraMove = true;
+                yield return HandleDeath(defender);
                 yield break;
             }
 
-            // 턴 교체
-            (currentAttacker, currentDefender) = (currentDefender, currentAttacker);
+            // 남아있으면 다시 큐에
+            if (!actor.IsDead) turnQueue.Enqueue(actor);
 
-
-            //공격 쿨타임 이걸 나중에 애니메이션 속도랑 동기화해줄예정임
             yield return new WaitForSeconds(attackDelay);
         }
     }
+
+    private IEnumerator HandleDeath(ICombatant fallen)
+    {
+        if (fallen == playerStats)
+        {
+            player.SetAnim(PlayerState.DEATH);
+            battleLogUI.AddLog("YOU DIE");
+            yield return new WaitForSeconds(1f);
+            SceneManager.LoadScene("RoomScene");
+        }
+        else
+        {
+            monster.SetAnim(MonsterState.DEATH);
+            battleLogUI.AddLog($"{fallen.Name} 처치!");
+            yield return new WaitForSeconds(1f);
+            Destroy(monsterTransform.GetChild(0).gameObject, 1f);
+            parallaxBackground.cameraMove = true;
+        }
+    }
+
 
     //무빙 무빙 
     private IEnumerator MoveOverTime(Transform target, Vector3 from, Vector3 to, float duration)
