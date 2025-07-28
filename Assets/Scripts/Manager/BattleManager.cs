@@ -5,13 +5,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(LogUI))]
 public class BattleManager : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform monsterTransform;
     [SerializeField] private ParallaxBackground parallaxBackground;
+    [SerializeField] private GameObject LogUI;
 
     [Header("Timing")]
     [SerializeField] private float moveDuration = 0.5f;
@@ -24,9 +24,11 @@ public class BattleManager : MonoBehaviour
     private ICombatant _monsterStats;
     private Queue<ICombatant> _turnQueue;
 
+    Coroutine combat;
+
     private void Awake()
     {
-        _logUI = GetComponent<LogUI>();
+        _logUI = LogUI.GetComponent<LogUI>();
     }
 
     private void OnEnable()
@@ -40,15 +42,19 @@ public class BattleManager : MonoBehaviour
         // HP 변경 UI 바인딩 예시
         _playerStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdatePlayerHp(cur, max);
         _monsterStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdateMonsterHp(cur, max);
-
-        StartCoroutine(StartBattleSequence());
+        
+        combat = StartCoroutine(StartBattleSequence());
+        Debug.Log(combat != null ? "전투 시작!" : "전투 시작 실패");
     }
 
     private IEnumerator StartBattleSequence()
     {
+        if (GameManager.Instance == null) yield return new WaitUntil(() => GameManager.Instance != null);
+
         // 전투 시작 로그
         _logUI.AddDayLog(GameManager.Instance.CurrentDay, "전투 시작!");
 
+        Debug.Log("??");
         // 연출: 플레이어/몬스터 접근
         yield return MoveOverTime(playerTransform, playerTransform.position,
                                  playerTransform.position + Vector3.right * 1f, moveDuration);

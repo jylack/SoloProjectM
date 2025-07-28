@@ -1029,12 +1029,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee16383876790a84e8b7e8e3c77673d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleLogUI: {fileID: 1369412105}
   playerTransform: {fileID: 2032462567}
   monsterTransform: {fileID: 1261482415}
+  parallaxBackground: {fileID: 1263076630}
+  LogUI: {fileID: 1369412101}
   moveDuration: 0.5
   attackDelay: 0.5
-  parallaxBackground: {fileID: 1263076630}
 --- !u!4 &499942577
 Transform:
   m_ObjectHideFlags: 0
@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerState: {fileID: 2032462568}
-  currentDay: 1
+  CurrentDay: 1
 --- !u!4 &537455656
 Transform:
   m_ObjectHideFlags: 0
@@ -2231,7 +2231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f19ca2930db01d647ae4ae974e07ec1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animCtrl: {fileID: 851180249}
+  animator: {fileID: 851180249}
 --- !u!1 &1263076626
 GameObject:
   m_ObjectHideFlags: 0

@@ -24,7 +24,6 @@ public class LogUI : MonoBehaviour
         if (messageText != null)
             messageText.text = message;
 
-
         StartCoroutine(ScrollToBottomNextFrame());
     }
 

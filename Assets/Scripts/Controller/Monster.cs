@@ -13,7 +13,6 @@ public enum MonsterState
     Death,    
 }
 
-[RequireComponent(typeof(Animator))]
 public class Monster : MonoBehaviour
 {
     [Header("½ºÅÝ")]
@@ -21,12 +20,8 @@ public class Monster : MonoBehaviour
     UnitStats unitStats = new UnitStats("Monster", 100, 10, 5, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
 
-    Animator animator;
+    [SerializeField] Animator animator;
 
-    private void Awake()
-    {
-        animator = GetComponent<Animator>();
-    }
 
     //Ãß°¡ ½ºÅÈ Àû¿ë
     public void StateApply(UnitStats stats)

@@ -31,9 +31,6 @@ public class StateUI : MonoBehaviour
         DefText.text = player.Defense.ToString();
     }
 
-    
-
-
     //추후 1만 넘어가면 K 단위로 나눌거임
 
 }

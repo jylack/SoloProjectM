@@ -182,7 +182,6 @@ public class FirebaseAuthMgr : MonoBehaviour
                     {
                         warningText.text = "";
                         confirmText.text = "생성 완료, 반갑습니다 " + user.DisplayName + "님";
-                        //StartBtn.interactable = true;
                         RegisterUI.SetActive(false); //회원가입 UI 비활성화
                     }
                 }
