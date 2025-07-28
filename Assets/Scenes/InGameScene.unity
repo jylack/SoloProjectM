@@ -1032,7 +1032,7 @@ MonoBehaviour:
   playerTransform: {fileID: 2032462567}
   monsterTransform: {fileID: 1261482415}
   parallaxBackground: {fileID: 1263076630}
-  LogUI: {fileID: 1369412101}
+  LogUIObj: {fileID: 1369412101}
   moveDuration: 0.5
   attackDelay: 0.5
 --- !u!4 &499942577

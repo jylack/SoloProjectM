@@ -11,7 +11,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform monsterTransform;
     [SerializeField] private ParallaxBackground parallaxBackground;
-    [SerializeField] private GameObject LogUI;
+    [SerializeField] private GameObject LogUIObj;
 
     [Header("Timing")]
     [SerializeField] private float moveDuration = 0.5f;
@@ -28,7 +28,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        _logUI = LogUI.GetComponent<LogUI>();
+        _logUI = LogUIObj.GetComponent<LogUI>();
     }
 
     private void OnEnable()
@@ -110,6 +110,8 @@ public class BattleManager : MonoBehaviour
             if (defender.IsDead)
             {
                 yield return HandleDeath(defender);
+                EndBattle();
+
                 yield break;
             }
 
@@ -119,6 +121,15 @@ public class BattleManager : MonoBehaviour
 
             yield return new WaitForSeconds(attackDelay);
         }
+    }
+
+
+    private void EndBattle()
+    {        
+        StageManager.Instance.AdvanceDay();
+        _logUI.AddDayLog(StageManager.Instance.CurrentDay, $"Stage {StageManager.Instance.CurrentStage}");
+        
+        combat = StartCoroutine(StartBattleSequence());
     }
 
     private IEnumerator HandleDeath(ICombatant fallen)

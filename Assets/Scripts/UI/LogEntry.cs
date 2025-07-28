@@ -29,7 +29,7 @@ public class LogEntry : MonoBehaviour
         SetupMessage(msg);
     }
 
-
+    
     private void SetupMessage(string message)
     {
         // 1) 텍스트 세팅
