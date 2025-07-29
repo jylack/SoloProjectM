@@ -15,32 +15,32 @@ public enum MonsterState
 
 public class Monster : MonoBehaviour
 {
-    [Header("½ºÅİ")]
+    [Header("ìŠ¤í…Ÿ")]
     string Name;
-    UnitStats unitStats = new UnitStats("Monster", 100, 10, 5, 1);
+    UnitStats unitStats = new UnitStats("Monster", 100, 10, 20, 1);
     UnitStats ApplyState = new UnitStats("", 0, 0, 0, 0);
 
     [SerializeField] Animator animator;
 
 
-    //Ãß°¡ ½ºÅÈ Àû¿ë
+    //ì¶”ê°€ ìŠ¤íƒ¯ ì ìš©
     public void StateApply(UnitStats stats)
     {
         ApplyState = stats;
     }
-    //¿øº»½ºÅİ ¹İÈ¯
+    //ì›ë³¸ìŠ¤í…Ÿ ë°˜í™˜
     public UnitStats GetOriginStats()
     {
         return unitStats;
     }
-    //Àû¿ëµÈ ½ºÅİ ¹İÈ¯
+    //ì ìš©ëœ ìŠ¤í…Ÿ ë°˜í™˜
     public UnitStats GetApplyState()
     {
         return ApplyState;
     }
 
 
-    //Àû¿ëµÈ ½ºÅİ°ú ¿øº»½ºÅİÀ» ÇÕÃÄ¼­ ¹İÈ¯
+    //ì ìš©ëœ ìŠ¤í…Ÿê³¼ ì›ë³¸ìŠ¤í…Ÿì„ í•©ì³ì„œ ë°˜í™˜
     public UnitStats GetStats()
     {
         UnitStats value = new UnitStats(unitStats.Name, unitStats.MaxHp + ApplyState.MaxHp, unitStats.Attack + ApplyState.Attack, unitStats.Speed + ApplyState.Speed, unitStats.MaxActionsPerTurn + ApplyState.MaxActionsPerTurn);
@@ -49,18 +49,18 @@ public class Monster : MonoBehaviour
     }
 
     /// <summary>
-    /// ÁöÁ¤µÈ »óÅÂ¿¡ ÇØ´çÇÏ´Â ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å¸¦ ½ÇÇàÇÕ´Ï´Ù.
+    /// ì§€ì •ëœ ìƒíƒœì— í•´ë‹¹í•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±°ë¥¼ ì‹¤í–‰í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="state">½ÇÇàÇÒ ¸ó½ºÅÍ »óÅÂ</param>
+    /// <param name="state">ì‹¤í–‰í•  ëª¬ìŠ¤í„° ìƒíƒœ</param>
     public void SetAnim(MonsterState state)
     {
         animator.SetTrigger(state.ToString());
     }
 
     /// <summary>
-    /// ÀüÅõ ½Ã½ºÅÛ¿¡¼­ »ç¿ëÇÒ ½ºÅÈ ÀÎÅÍÆäÀÌ½º¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// ì „íˆ¬ ì‹œìŠ¤í…œì—ì„œ ì‚¬ìš©í•  ìŠ¤íƒ¯ ì¸í„°í˜ì´ìŠ¤ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <returns>ICombatant Å¸ÀÔÀ¸·Î UnitStats ¹İÈ¯</returns>
+    /// <returns>ICombatant íƒ€ì…ìœ¼ë¡œ UnitStats ë°˜í™˜</returns>
     public ICombatant GetCombatStats()
     {
         return unitStats;

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -152,6 +152,7 @@ public class SPUM_SpriteEditManager : MonoBehaviour
             _syncList[i].GetComponent<SpriteSync>()._nowSprite = null;
         }        
     }
+
     //Reset all sprite added.
 
     public void SetPivot(SpriteRenderer _sprite)

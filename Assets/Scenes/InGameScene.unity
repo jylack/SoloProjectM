@@ -1033,7 +1033,7 @@ MonoBehaviour:
   monsterTransform: {fileID: 1261482415}
   parallaxBackground: {fileID: 1263076630}
   LogUIObj: {fileID: 1369412101}
-  moveDuration: 0.5
+  moveDuration: 1
   attackDelay: 0.5
 --- !u!4 &499942577
 Transform:
@@ -2948,7 +2948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d771ff18b75a7c4689d9c5fa29e8ad4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHpBar: {fileID: 0}
+  playerHpBar: {fileID: 2137516121}
   playerHpText: {fileID: 2107844570}
   monsterHpBar: {fileID: 0}
   monsterHpText: {fileID: 0}
@@ -3587,6 +3587,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2137516121 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 385059990873748000, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+  m_PrefabInstance: {fileID: 2083914671894601622}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2139999454
 GameObject:
   m_ObjectHideFlags: 0
@@ -3679,6 +3690,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1464847764}
     m_Modifications:
+    - target: {fileID: 3901542161680683873, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4676237023864754025, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3759,9 +3774,49 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4795797046336380658, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4795797046336380658, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5151079850054027471, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
       propertyPath: m_Name
       value: StateUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782677952579325223, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782677952579325223, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782677952579325223, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7150941175105989734, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7150941175105989734, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7150941175105989734, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8210930632267546547, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8210930632267546547, guid: dada443ebd933ee4d8a9b380f9b4449c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

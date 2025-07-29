@@ -14,7 +14,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject LogUIObj;
 
     [Header("Timing")]
-    [SerializeField] private float moveDuration = 0.5f;
+    [SerializeField] private float moveDuration = 5.5f;
     [SerializeField] private float attackDelay = 0.5f;
 
     private LogUI _logUI;
@@ -33,29 +33,29 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // ÄÄÆ÷³ÍÆ® & ½ºÅÈ ÃÊ±âÈ­
+        // ì»´í¬ë„ŒíŠ¸ & ìŠ¤íƒ¯ ì´ˆê¸°í™”
         _player = playerTransform.GetComponent<Player>();
         _monster = monsterTransform.GetComponent<Monster>();
         _playerStats = _player.GetStats();
         _monsterStats = _monster.GetStats();
 
-        // HP º¯°æ UI ¹ÙÀÎµù ¿¹½Ã
+        // HP ë³€ê²½ UI ë°”ì¸ë”© ì˜ˆì‹œ
         _playerStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdatePlayerHp(cur, max);
         _monsterStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdateMonsterHp(cur, max);
-        
+
         combat = StartCoroutine(StartBattleSequence());
-        Debug.Log(combat != null ? "ÀüÅõ ½ÃÀÛ!" : "ÀüÅõ ½ÃÀÛ ½ÇÆĞ");
+        Debug.Log(combat != null ? "ì „íˆ¬ ì‹œì‘!" : "ì „íˆ¬ ì‹œì‘ ì‹¤íŒ¨");
     }
 
     private IEnumerator StartBattleSequence()
     {
         if (GameManager.Instance == null) yield return new WaitUntil(() => GameManager.Instance != null);
 
-        // ÀüÅõ ½ÃÀÛ ·Î±×
-        _logUI.AddDayLog(GameManager.Instance.CurrentDay, "ÀüÅõ ½ÃÀÛ!");
+        // ì „íˆ¬ ì‹œì‘ ë¡œê·¸
+        _logUI.AddDayLog(GameManager.Instance.CurrentDay, "ì „íˆ¬ ì‹œì‘!");
 
 
-        // ¿¬Ãâ ÇÃ·¹ÀÌ¾î/¸ó½ºÅÍ Á¢±Ù
+        // ì—°ì¶œ í”Œë ˆì´ì–´/ëª¬ìŠ¤í„° ì ‘ê·¼
         yield return MoveOverTime(playerTransform, playerTransform.position,
                                  playerTransform.position + Vector3.right * 1f, moveDuration);
 
@@ -66,14 +66,14 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(attackDelay);
         parallaxBackground.cameraMove = false;
 
-        // ÅÏ Å¥ ÃÊ±âÈ­ & ÀüÅõ ·çÇÁ ½ÃÀÛ
+        // í„´ í ì´ˆê¸°í™” & ì „íˆ¬ ë£¨í”„ ì‹œì‘
         InitTurnQueue();
         StartCoroutine(CombatLoop());
     }
 
     private void InitTurnQueue()
     {
-        // ¼Óµµ ³»¸²Â÷¼ø Á¤·Ä ÈÄ Å¥¿¡ ³Ö±â
+        // ì†ë„ ë‚´ë¦¼ì°¨ìˆœ ì •ë ¬ í›„ íì— ë„£ê¸°
         var ordered = new List<ICombatant> { _playerStats, _monsterStats }
                       .OrderByDescending(u => u.Speed);
         _turnQueue = new Queue<ICombatant>(ordered);
@@ -91,22 +91,22 @@ public class BattleManager : MonoBehaviour
 
             actor.ResetActions();
 
-            // ³²Àº Çàµ¿¸¸Å­ ¹İº¹
+            // ë‚¨ì€ í–‰ë™ë§Œí¼ ë°˜ë³µ
             while (actor.ActionsRemaining > 0 && !defender.IsDead)
             {
-                // °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç
+                // ê³µê²© ì• ë‹ˆë©”ì´ì…˜
                 if (actor == _playerStats) _player.SetAnim(PlayerState.ATTACK);
                 else _monster.SetAnim(MonsterState.Atk1);
 
-                // ÇÇÇØ Àû¿ë
+                // í”¼í•´ ì ìš©
                 defender.TakeDamage(actor.Attack);
-                _logUI.AddLog($"{actor.Name} ¡æ {defender.Name} : {actor.Attack} ÇÇÇØ");
+                _logUI.AddLog($"{actor.Name} â†’ {defender.Name} : {actor.Attack} í”¼í•´");
 
                 actor.ActionsRemaining--;
                 yield return new WaitForSeconds(attackDelay);
             }
 
-            // »ç¸Á Ã³¸®
+            // ì‚¬ë§ ì²˜ë¦¬
             if (defender.IsDead)
             {
                 yield return HandleDeath(defender);
@@ -115,7 +115,7 @@ public class BattleManager : MonoBehaviour
                 yield break;
             }
 
-            // ´Ù½Ã Å¥¿¡ ³Ö±â
+            // ë‹¤ì‹œ íì— ë„£ê¸°
             if (!actor.IsDead)
                 _turnQueue.Enqueue(actor);
 
@@ -125,10 +125,10 @@ public class BattleManager : MonoBehaviour
 
 
     private void EndBattle()
-    {        
+    {
         StageManager.Instance.AdvanceDay();
         _logUI.AddDayLog(StageManager.Instance.CurrentDay, $"Stage {StageManager.Instance.CurrentStage}");
-        
+
         combat = StartCoroutine(StartBattleSequence());
     }
 
@@ -138,14 +138,18 @@ public class BattleManager : MonoBehaviour
         {
             _player.SetAnim(PlayerState.DEATH);
             _logUI.AddLog("YOU DIED");
+
             yield return new WaitForSeconds(1f);
+
             SceneManager.LoadScene(nameof(SceneNames.RoomScene));
         }
         else
         {
             _monster.SetAnim(MonsterState.Death);
-            _logUI.AddLog($"{fallen.Name} Ã³Ä¡!");
+            _logUI.AddLog($"{fallen.Name} ì²˜ì¹˜!");
+
             yield return new WaitForSeconds(1f);
+
             Destroy(monsterTransform.GetChild(0).gameObject, 1f);
             parallaxBackground.cameraMove = true;
         }
