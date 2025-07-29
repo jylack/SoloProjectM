@@ -1033,7 +1033,7 @@ MonoBehaviour:
   monsterTransform: {fileID: 1261482415}
   parallaxBackground: {fileID: 1263076630}
   LogUIObj: {fileID: 1369412101}
-  moveDuration: 1
+  moveDuration: 3
   attackDelay: 0.5
 --- !u!4 &499942577
 Transform:
@@ -1060,6 +1060,7 @@ GameObject:
   m_Component:
   - component: {fileID: 537455656}
   - component: {fileID: 537455655}
+  - component: {fileID: 537455657}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1096,6 +1097,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &537455657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537455654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d59d14ece2d3d49a47c8d3d70a6432, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  table: {fileID: 11400000, guid: 0d63ad860830eca4cbbaeeb847dde548, type: 2}
 --- !u!1 &584374081
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-// EncounterManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,9 +21,21 @@ public class EncounterManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if ((StageManager.Instance != null))
+        {
+            StageManager.Instance.OnStageDayChanged.AddListener(SetupForDay);
+        }
+        else
+        {
+            Debug.LogError("EncounterManager: StageManager가 초기화되지 않았습니다.");
+        }
+    }
+
     private void OnEnable()
     {
-        StageManager.Instance.OnStageDayChanged.AddListener(SetupForDay);
+        //StageManager.Instance.OnStageDayChanged.AddListener(SetupForDay);
     }
 
     private void OnDisable()
@@ -45,14 +56,14 @@ public class EncounterManager : MonoBehaviour
     /// </summary>
     public List<MonsterDefinition> GetRandomEncounters(int count)
     {
-
-
         var result = new List<MonsterDefinition>();
+
         if (_todayData == null || _todayData.possibleMonsters.Count == 0)
             return result;
 
         // 전체 가중치 합산
         int totalWeight = 0;
+
         foreach (var e in _todayData.possibleMonsters)
             totalWeight += e.weight;
 
@@ -60,9 +71,11 @@ public class EncounterManager : MonoBehaviour
         {
             int roll = Random.Range(0, totalWeight);
             int cum = 0;
+
             foreach (var e in _todayData.possibleMonsters)
             {
                 cum += e.weight;
+
                 if (roll < cum)
                 {
                     result.Add(e.monsterDef);

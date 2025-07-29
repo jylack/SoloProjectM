@@ -16,7 +16,7 @@ public class MonsterDefinition : ScriptableObject
 }
 
 /// <summary>
-/// 전투 시스템에서 사용할 공통 인터페이스를 구현한   ㅜㅜ몬스터 베이스 클래스
+/// 전투 시스템에서 사용할 공통 인터페이스를 구현한 몬스터 베이스 클래스
 /// </summary>
 public abstract class MonsterBase : MonoBehaviour, ICombatant
 {

@@ -31,6 +31,7 @@ public class BattleManager : MonoBehaviour
         _logUI = LogUIObj.GetComponent<LogUI>();
     }
 
+
     private void OnEnable()
     {
         // 컴포넌트 & 스탯 초기화
@@ -49,7 +50,8 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator StartBattleSequence()
     {
-        if (GameManager.Instance == null) yield return new WaitUntil(() => GameManager.Instance != null);
+        if (GameManager.Instance == null) 
+            yield return new WaitUntil(() => GameManager.Instance != null);
 
         // 전투 시작 로그
         _logUI.AddDayLog(GameManager.Instance.CurrentDay, "전투 시작!");
