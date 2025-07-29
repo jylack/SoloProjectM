@@ -15,5 +15,7 @@ MonoBehaviour:
   stage: 1
   day: 2
   possibleMonsters:
-  - monsterPrefab: {fileID: 2193536033020928697, guid: 8b84b47aa45ca86458d047d0b2593e9e, type: 3}
-    weight: 0
+  - monsterDef: {fileID: 11400000, guid: d960f81872f960d42a522a889ee3dca8, type: 2}
+    weight: 2
+  - monsterDef: {fileID: 11400000, guid: 162e0a6f4bdc0454b9db372bec6e4696, type: 2}
+    weight: 1

@@ -6,10 +6,10 @@ public class EncounterManager : MonoBehaviour
 {
     public static EncounterManager Instance { get; private set; }
 
-    [Header("¿¡µğÅÍ¿¡¼­ ¸¸µç EncounterTable ¿¬°á")]
+    [Header("ì—ë””í„°ì—ì„œ ë§Œë“  EncounterTable ì—°ê²°")]
     [SerializeField] private EncounterTable table;
 
-    // ÇöÀç ³¯Â¥ ½ºÅ×ÀÌÁö¿¡ ¸Â´Â µ¥ÀÌÅÍ
+    // í˜„ì¬ ë‚ ì§œ ìŠ¤í…Œì´ì§€ì— ë§ëŠ” ë°ì´í„°
     private DailyEncounterData _todayData;
 
     private void Awake()
@@ -37,21 +37,24 @@ public class EncounterManager : MonoBehaviour
     {
         _todayData = table.dailyData.Find(d => d.stage == stage && d.day == day);
         if (_todayData == null)
-            Debug.LogWarning($"EncounterTable¿¡ Stage {stage}, Day {day} ¼³Á¤ÀÌ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"EncounterTableì— Stage {stage}, Day {day} ì„¤ì •ì´ ì—†ìŠµë‹ˆë‹¤.");
     }
 
     /// <summary>
-    /// ÀÎÄ«¿îÅÍ ¹ß»ı ½Ã È£Ãâ. °¡ÁßÄ¡¸¦ °í·ÁÇØ N¸¶¸® »Ì¾Æ¼­ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// ì¸ì¹´ìš´í„° ë°œìƒ ì‹œ í˜¸ì¶œ. ê°€ì¤‘ì¹˜ë¥¼ ê³ ë ¤í•´ Në§ˆë¦¬ ë½‘ì•„ì„œ ë°˜í™˜í•©ë‹ˆë‹¤.
     /// </summary>
-    public List<GameObject> GetRandomEncounters(int count)
+    public List<MonsterDefinition> GetRandomEncounters(int count)
     {
-        var result = new List<GameObject>();
+
+
+        var result = new List<MonsterDefinition>();
         if (_todayData == null || _todayData.possibleMonsters.Count == 0)
             return result;
 
-        // ÀüÃ¼ °¡ÁßÄ¡ ÇÕ»ê
+        // ì „ì²´ ê°€ì¤‘ì¹˜ í•©ì‚°
         int totalWeight = 0;
-        foreach (var e in _todayData.possibleMonsters) totalWeight += e.weight;
+        foreach (var e in _todayData.possibleMonsters)
+            totalWeight += e.weight;
 
         for (int i = 0; i < count; i++)
         {
@@ -62,7 +65,7 @@ public class EncounterManager : MonoBehaviour
                 cum += e.weight;
                 if (roll < cum)
                 {
-                    result.Add(e.monsterPrefab);
+                    result.Add(e.monsterDef);
                     break;
                 }
             }
