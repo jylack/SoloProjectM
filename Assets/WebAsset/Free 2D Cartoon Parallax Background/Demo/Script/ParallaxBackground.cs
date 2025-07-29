@@ -11,10 +11,12 @@ public class ParallaxBackground : MonoBehaviour
     public float[] layerSpeed;             // 각 레이어의 패럴랙스 이동 속도 (0 = 고정, 1 = 카메라와 동일)
 
     private Transform _camera;              // 메인 카메라 Transform
-    private Vector2[] startPositions;             // 각 레이어별 시작 위치 (카메라 기준 좌표 저장)    
+    private Vector2[] startPositions;       // 각 레이어별 시작 위치 (카메라 기준 좌표 저장)    
     private float[] layerWidths;            // 각 레이어의 가로 길이 (월드 단위)
     private float boundSizeX;               // 스프라이트 원본의 가로 크기        
     private float sizeX;                    // 배경 스프라이트 오브젝트의 스케일 (x축)
+
+
     private void Awake()
     {
         if(layerObjects.Length != layerSpeed.Length)
@@ -80,14 +82,14 @@ public class ParallaxBackground : MonoBehaviour
 
             //boundSizeX * sizeX = 레이어의 가로 길이
             // 오른쪽으로 넘어갔을 경우 → 시작 위치를 오른쪽으로 한 칸 이동
-            if (temp > startPositions[i].x + boundSizeX * sizeX)
+            if (temp > startPositions[i].x + layerWidths[i])
             {
-                startPositions[i].x += boundSizeX * sizeX;
+                startPositions[i].x += layerWidths[i];
             }
             // 왼쪽으로 넘어갔을 경우 → 시작 위치를 왼쪽으로 한 칸 이동
-            else if (temp < startPositions[i].x - boundSizeX * sizeX)
+            else if (temp < startPositions[i].x - layerWidths[i])
             {
-                startPositions[i].x -= boundSizeX * sizeX;
+                startPositions[i].x -= layerWidths[i];
             }
         }
     }
