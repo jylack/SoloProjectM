@@ -116,7 +116,7 @@ public class FirebaseAuthMgr : MonoBehaviour
             nickField.text = user.DisplayName;
             confirmText.text = "로그인 완료, 반갑습니다 " + user.DisplayName + "님";
             
-            GameManager.instance.SceneLoad(SceneName.RoomScene);
+            GameManager.Instance.SceneLoad(SceneName.RoomScene);
         }
     }
 
@@ -182,7 +182,6 @@ public class FirebaseAuthMgr : MonoBehaviour
                     {
                         warningText.text = "";
                         confirmText.text = "생성 완료, 반갑습니다 " + user.DisplayName + "님";
-                        //StartBtn.interactable = true;
                         RegisterUI.SetActive(false); //회원가입 UI 비활성화
                     }
                 }
@@ -192,6 +191,6 @@ public class FirebaseAuthMgr : MonoBehaviour
 
     public void TestLogin()
     {
-        GameManager.instance.SceneLoad(SceneName.RoomScene);
+        GameManager.Instance.SceneLoad(SceneName.RoomScene);
     }
 }
