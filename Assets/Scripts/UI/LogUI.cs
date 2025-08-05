@@ -1,12 +1,13 @@
 using System.Collections;
+using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LogUI : MonoBehaviour
 {
-    [SerializeField] private RectTransform contentRoot; // ∑Œ±◊∞° Ω◊¿œ Content
-    [SerializeField] private ScrollRect scrollRect;     // ScrollView¿« ScrollRect
+    [SerializeField] private RectTransform contentRoot; // Î°úÍ∑∏Í∞Ä ÏåìÏùº Content
+    [SerializeField] private ScrollRect scrollRect;     // ScrollViewÏùò ScrollRect
     
     private LogPool logPool;
 
@@ -16,7 +17,11 @@ public class LogUI : MonoBehaviour
     }
 
     public void AddDayLog(int day, string message)
-    {
+    {        
+        Debug.Log(scrollRect.gameObject.name);
+        Debug.Log(contentRoot.gameObject.name);
+        Debug.Log(logPool.gameObject.name);
+
         var entry = logPool.Get();
         entry.transform.SetParent(contentRoot, false);
         entry.InitializeDay(day, message);

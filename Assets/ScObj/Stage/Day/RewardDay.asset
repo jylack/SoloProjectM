@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 061ffd0a3aba1644c851cb0533b191b6, type: 3}
-  m_Name: Battle
+  m_Name: RewardDay
   m_EditorClassIdentifier: 
-  stage: 1
-  day: 2
-  possibleMonsters:
-  - monsterDef: {fileID: 11400000, guid: d960f81872f960d42a522a889ee3dca8, type: 2}
-    weight: 2
-  - monsterDef: {fileID: 11400000, guid: 162e0a6f4bdc0454b9db372bec6e4696, type: 2}
-    weight: 1
+  stage: 0
+  day: 0
+  possibleMonsters: []
+  possibleSkills:
+  - {fileID: 11400000, guid: bac074428b6e1c44a9040575ef272106, type: 2}
+  - {fileID: 11400000, guid: c79432021bb8f4d44b566316428f8b0b, type: 2}
+  - {fileID: 11400000, guid: 304c9bc74ea046447829634587f2ca8b, type: 2}

@@ -2083,6 +2083,7 @@ GameObject:
   - component: {fileID: 1023107728}
   - component: {fileID: 1023107730}
   - component: {fileID: 1023107729}
+  - component: {fileID: 1023107731}
   m_Layer: 5
   m_Name: selectBtn
   m_TagString: Untagged
@@ -2147,6 +2148,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1023107727}
   m_CullTransparentMesh: 1
+--- !u!114 &1023107731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023107727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1023107729}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1261482414
 GameObject:
   m_ObjectHideFlags: 0
@@ -2426,6 +2471,7 @@ GameObject:
   - component: {fileID: 1308478690}
   - component: {fileID: 1308478692}
   - component: {fileID: 1308478691}
+  - component: {fileID: 1308478693}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -2492,6 +2538,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1308478693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308478689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be4b0d7e6e8a63049a796b954c97bbfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entryPrefab: {fileID: 437400215630068327, guid: 4406211d617bc7b47bee048965407ca1, type: 3}
+  initialSize: 10
 --- !u!1 &1327459642
 GameObject:
   m_ObjectHideFlags: 0
@@ -2598,7 +2658,6 @@ GameObject:
   - component: {fileID: 1369412104}
   - component: {fileID: 1369412103}
   - component: {fileID: 1369412105}
-  - component: {fileID: 1369412106}
   m_Layer: 5
   m_Name: LogUI
   m_TagString: Untagged
@@ -2678,20 +2737,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentRoot: {fileID: 1308478690}
   scrollRect: {fileID: 372009380}
---- !u!114 &1369412106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1369412101}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be4b0d7e6e8a63049a796b954c97bbfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  entryPrefab: {fileID: 437400215630068327, guid: 4406211d617bc7b47bee048965407ca1, type: 3}
-  initialSize: 10
 --- !u!1 &1464847763
 GameObject:
   m_ObjectHideFlags: 0

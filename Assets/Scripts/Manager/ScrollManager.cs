@@ -42,9 +42,8 @@ public class ScrollManager : MonoBehaviour
 
     private void Start()
     {
-        scrollbar.value = 0.5f; // ÃÊ±â°ª ¼³Á¤
-        targetIndex = 2; // ÃÊ±â Å¸°Ù ÀÎµ¦½º ¼³Á¤
-        targetPos = scrollbar.value; // ÃÊ±â Å¸°Ù À§Ä¡ ¼³Á¤
+        targetIndex = 2; // ì´ˆê¸° íƒ€ê²Ÿ ì¸ë±ìŠ¤ ì„¤ì •
+        targetPos = scrollbar.value; // ì´ˆê¸° íƒ€ê²Ÿ ìœ„ì¹˜ ì„¤ì •
 
         distance = 1f / (SIZE - 1);
         
@@ -52,6 +51,7 @@ public class ScrollManager : MonoBehaviour
         {
             pos[i] = distance * i;
         }
+        scrollbar.value = 0.5f; // ì´ˆê¸°ê°’ ì„¤ì •
     }
 
     private void OnTouchStart(InputAction.CallbackContext ctx)
@@ -71,7 +71,7 @@ public class ScrollManager : MonoBehaviour
 
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
         {
-            // ¼öÆò µå·¡±× ÆÇ´Ü
+            // ìˆ˜í‰ ë“œëž˜ê·¸ íŒë‹¨
             if (delta.x > 18 && cur - distance >= 0) --targetIndex;
             else if (delta.x < -18 && cur + distance <= 1.01f) ++targetIndex;
 

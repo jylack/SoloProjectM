@@ -50,18 +50,23 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator StartBattleSequence()
     {
+        
         if (GameManager.Instance == null) 
             yield return new WaitUntil(() => GameManager.Instance != null);
 
         // 전투 시작 로그
         _logUI.AddDayLog(GameManager.Instance.CurrentDay, "전투 시작!");
 
+        Debug.Log(playerTransform.gameObject.name);
 
         // 연출 플레이어/몬스터 접근
         yield return MoveOverTime(playerTransform, playerTransform.position,
                                  playerTransform.position + Vector3.right * 1f, moveDuration);
 
+        Debug.Log(monsterTransform.gameObject.name);
+
         var monsterStart = monsterTransform.position + Vector3.right * 2.5f;
+
         yield return MoveOverTime(monsterTransform, monsterStart,
                                  monsterStart + Vector3.left * 3.5f, moveDuration);
 

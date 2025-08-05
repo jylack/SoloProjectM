@@ -13,4 +13,9 @@ public class DailyEncounterData : ScriptableObject
 
     [Tooltip("이 날 등장 가능한 몬스터 리스트")]
     public List<MonsterEncounter> possibleMonsters;
+
+    [Tooltip("이 날 등장 가능한 스킬 리스트")]
+    public List<Skill> possibleSkills;
+
+
 }

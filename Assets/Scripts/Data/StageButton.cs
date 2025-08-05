@@ -12,13 +12,15 @@ public class StageButton : MonoBehaviour
 
     private StageDefinition _def;
 
+
+
     public void Initialize(StageDefinition def)
     {
         _def = def;
         stageNameText.text = def.stageName;
         daysText.text = $"{def.maxDays}일";
-        
-        if(def.backgroundSprite != null) 
+
+        if (def.backgroundSprite != null) 
             backgroundImage.sprite = def.backgroundSprite;
 
         button.onClick.RemoveAllListeners();
@@ -27,7 +29,7 @@ public class StageButton : MonoBehaviour
 
     private void OnClick()
     {
-        // 1) 선택한 스테이지로 강제 설정
+        // 1) 선택한 스테이지로 설정
         StageManager.Instance.ForceStage(_def.stageId);
 
         // 2) GameManager를 통해 InGameScene 로드

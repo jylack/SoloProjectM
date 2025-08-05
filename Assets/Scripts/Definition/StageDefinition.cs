@@ -28,5 +28,7 @@ public class StageDefinition : ScriptableObject
     [Header("패럴랙스 배경 설정")]
     public bool parallaxEnabled = true;            // 패럴랙스 동작 여부
     public float parallaxCameraSpeed = 1.5f;       // 카메라 이동 속도
-    public float[] parallaxLayerSpeeds = new float[0];  // 레이어별 패럴랙스 속도
+    public float[] parallaxLayerSpeeds = new float[0];  // 레이어별 패럴랙스 속도   
+
+
 }

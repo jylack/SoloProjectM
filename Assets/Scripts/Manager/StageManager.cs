@@ -52,8 +52,7 @@ public class StageManager : MonoBehaviour
         if (_stageDurations.TryGetValue(CurrentStage, out var maxDay)
             && CurrentDay > maxDay)
         {
-            CurrentStage++;
-            CurrentDay = 1;
+           EndStage();
         }
 
         OnStageDayChanged?.Invoke(CurrentStage, CurrentDay);
@@ -71,4 +70,8 @@ public class StageManager : MonoBehaviour
         OnStageDayChanged?.Invoke(CurrentStage, CurrentDay);
     }
 
+    private void EndStage()
+    {
+        Debug.Log($"Stage {CurrentStage} 완료! 룸으로 돌아가던지 다음스테이지 바로가던지 결정");
+    }
 }
