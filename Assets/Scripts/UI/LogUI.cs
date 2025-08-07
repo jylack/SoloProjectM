@@ -13,7 +13,11 @@ public class LogUI : MonoBehaviour
 
     private void Awake()
     {
-        logPool = GetComponent<LogPool>();
+        logPool = contentRoot.GetComponent<LogPool>();
+        if (logPool == null)
+        {
+            Debug.LogError("LogPool 컴포넌트가 ContentRoot에 없습니다. LogUI를 올바르게 설정해주세요.");
+        }
     }
 
     public void AddDayLog(int day, string message)

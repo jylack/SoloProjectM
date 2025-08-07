@@ -6,20 +6,20 @@ public interface ICombatant
     int Speed { get; }
     int Attack { get; }
 
-    /// <summary>ÇÑ ÅÏ¿¡ ¼öÇà °¡´ÉÇÑ ÃÖ´ë Çàµ¿ È½¼ö</summary>
+    /// <summary>í•œ í„´ì— ìˆ˜í–‰ ê°€ëŠ¥í•œ ìµœëŒ€ í–‰ë™ íšŸìˆ˜</summary>
     int MaxActionsPerTurn { get; }
 
-    /// <summary>³²Àº Çàµ¿ È½¼ö</summary>
+    /// <summary>ë‚¨ì€ í–‰ë™ íšŸìˆ˜</summary>
     int ActionsRemaining { get; set; }
 
     bool IsDead { get; }
 
-    /// <summary>HP º¯È­ ½Ã (ÇöÀçHP, ÃÖ´ëHP)¸¦ ¹ßÇà</summary>
+    /// <summary>HP ë³€í™” ì‹œ (í˜„ì¬HP, ìµœëŒ€HP)ë¥¼ ë°œí–‰</summary>
     event Action<int, int> OnHpChanged;
 
-    /// <summary>ÅÏ ½ÃÀÛ ½Ã Çàµ¿ È½¼ö ÃÊ±âÈ­</summary>
+    /// <summary>í„´ ì‹œì‘ ì‹œ í–‰ë™ íšŸìˆ˜ ì´ˆê¸°í™”</summary>
     void ResetActions();
 
-    /// <summary>µ¥¹ÌÁö Àû¿ë</summary>
+    /// <summary>ë°ë¯¸ì§€ ì ìš©</summary>
     void TakeDamage(int amount);
 }

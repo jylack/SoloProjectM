@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -209,6 +210,7 @@ public class SPUM_Prefabs : MonoBehaviour
             }
         }
     }
+
     AnimationClip LoadAnimationClip(string clipPath)
     {
         // "Animations" 폴더에서 애니메이션 클립 로드
@@ -222,5 +224,4 @@ public class SPUM_Prefabs : MonoBehaviour
         return clip;
     }
 
-    
 }

@@ -24,33 +24,34 @@ public class BattleManager : MonoBehaviour
     private ICombatant _monsterStats;
     private Queue<ICombatant> _turnQueue;
 
-    Coroutine combat;
+    Coroutine combat = null;
 
     private void Awake()
     {
         _logUI = LogUIObj.GetComponent<LogUI>();
     }
 
-
-    private void OnEnable()
+    
+    private void Start()
     {
         // 컴포넌트 & 스탯 초기화
         _player = playerTransform.GetComponent<Player>();
         _monster = monsterTransform.GetComponent<Monster>();
         _playerStats = _player.GetStats();
         _monsterStats = _monster.GetStats();
-
-        // HP 변경 UI 바인딩 예시
-        _playerStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdatePlayerHp(cur, max);
-        _monsterStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdateMonsterHp(cur, max);
-
         combat = StartCoroutine(StartBattleSequence());
-        Debug.Log(combat != null ? "전투 시작!" : "전투 시작 실패");
     }
 
     private IEnumerator StartBattleSequence()
     {
-        
+        Debug.Log("전투 시작 시퀀스 시작");
+        if (UIManager.Instance == null)
+            yield return new WaitUntil(() => UIManager.Instance != null);
+        // HP 변경 UI 바인딩
+        _playerStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdatePlayerHp(cur, max);
+        _monsterStats.OnHpChanged += (cur, max) => UIManager.Instance.UpdateMonsterHp(cur, max);
+
+        Debug.Log("전투 시작 시퀀스");
         if (GameManager.Instance == null) 
             yield return new WaitUntil(() => GameManager.Instance != null);
 
@@ -102,8 +103,13 @@ public class BattleManager : MonoBehaviour
             while (actor.ActionsRemaining > 0 && !defender.IsDead)
             {
                 // 공격 애니메이션
-                if (actor == _playerStats) _player.SetAnim(PlayerState.ATTACK);
+                if (actor == _playerStats)
+                {
+                    _player.SetAnim(PlayerState.ATTACK);
+                }
                 else _monster.SetAnim(MonsterState.Atk1);
+
+                
 
                 // 피해 적용
                 defender.TakeDamage(actor.Attack);
