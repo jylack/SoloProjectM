@@ -4,25 +4,24 @@ using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
 
 public class FirebaseAuthMgr : MonoBehaviour
 {
-    public Button LoginBtn;    //·Î±×ÀÎ ¹öÆ°
-    public Button RegisterBtn; //Èñ¿ø°¡ÀÔUI ¿ÀÇÂ
-    public Button CreateIDBtn; //¾ÆÀÌµğ »ı¼º ¹öÆ°
+    public Button LoginBtn;    //ë¡œê·¸ì¸ ë²„íŠ¼
+    public Button RegisterBtn; //í¬ì›ê°€ì…UI ì˜¤í”ˆ
+    public Button CreateIDBtn; //ì•„ì´ë”” ìƒì„± ë²„íŠ¼
 
-    public FirebaseUser user;  //ÀÎÁõµÈ À¯Àú Á¤º¸. À¥°³¹ß·Î Ä¡¸é ÅäÅ«°°Àº ´À³¦
-    public FirebaseAuth auth;  //ÀÎÁõ ÁøÇàÀ» À§ÇÑ Á¤º¸
+    public FirebaseUser user;  //ì¸ì¦ëœ ìœ ì € ì •ë³´. ì›¹ê°œë°œë¡œ ì¹˜ë©´ í† í°ê°™ì€ ëŠë‚Œ
+    public FirebaseAuth auth;  //ì¸ì¦ ì§„í–‰ì„ ìœ„í•œ ì •ë³´
 
-    public TMP_InputField emailField; //À¯Àú°¡ ÀÔ·ÂÇÑ ÀÌ¸ŞÀÏ
-    public TMP_InputField pwField; //À¯Àú°¡ ÀÔ·ÂÇÑ ºñ¹Ğ¹øÈ£
-    public TMP_InputField nickField; //Èñ¿ø °¡ÀÔ½Ã ÀÔ·ÂÇÒ ´Ğ³×ÀÓ
+    public TMP_InputField emailField; //ìœ ì €ê°€ ì…ë ¥í•œ ì´ë©”ì¼
+    public TMP_InputField pwField; //ìœ ì €ê°€ ì…ë ¥í•œ ë¹„ë°€ë²ˆí˜¸
+    public TMP_InputField nickField; //í¬ì› ê°€ì…ì‹œ ì…ë ¥í•  ë‹‰ë„¤ì„
 
-    public GameObject RegisterUI; //È¸¿ø°¡ÀÔ UI
+    public GameObject RegisterUI; //íšŒì›ê°€ì… UI
 
     public Text warningText;
     public Text confirmText;
@@ -41,7 +40,7 @@ public class FirebaseAuthMgr : MonoBehaviour
             {
                 UnityEngine.Debug.LogError(System.String.Format(
                   "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
-                // Firebase Unity SDK¸¦ »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.
+                // Firebase Unity SDKë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.
             }
         });
 
@@ -52,7 +51,7 @@ public class FirebaseAuthMgr : MonoBehaviour
 
     private void Start()
     {
-        RegisterUI.SetActive(false); //È¸¿ø°¡ÀÔ UI ºñÈ°¼ºÈ­
+        RegisterUI.SetActive(false); //íšŒì›ê°€ì… UI ë¹„í™œì„±í™”
         warningText.text = "";
         confirmText.text = "";
     }
@@ -63,12 +62,14 @@ public class FirebaseAuthMgr : MonoBehaviour
 
     public void Register()
     {
-        RegisterUI.SetActive(true); //È¸¿ø°¡ÀÔ UI È°¼ºÈ­
+        RegisterUI.SetActive(true); //íšŒì›ê°€ì… UI í™œì„±í™”
+        RegisterUI.GetComponent<RegisterUI>().Setting(user, auth, warningText, confirmText);
     }
 
     public void CreateID()
     {
-        StartCoroutine(RegisterCor(emailField.text, pwField.text, nickField.text));
+        //StartCoroutine(RegisterCor(emailField.text, pwField.text, nickField.text));
+        RegisterUI.GetComponent<RegisterUI>().StartRegister();
     }
 
     private IEnumerator LoginCor(string email, string password)
@@ -79,9 +80,9 @@ public class FirebaseAuthMgr : MonoBehaviour
 
         if (LoginTask.Exception != null)
         {
-            Debug.LogWarning(message: "´ÙÀ½°ú °°Àº ÀÌÀ¯·Î ·Î±×ÀÎ ½ÇÆĞ:" + LoginTask.Exception);
+            Debug.LogWarning(message: "ë‹¤ìŒê³¼ ê°™ì€ ì´ìœ ë¡œ ë¡œê·¸ì¸ ì‹¤íŒ¨:" + LoginTask.Exception);
 
-            //ÆÄÀÌ¾îº£ÀÌ½º¿¡¼± ¿¡·¯¸¦ ºĞ¼®ÇÒ ¼ö ÀÖ´Â Çü½ÄÀ» Á¦°ø
+            //íŒŒì´ì–´ë² ì´ìŠ¤ì—ì„  ì—ëŸ¬ë¥¼ ë¶„ì„í•  ìˆ˜ ìˆëŠ” í˜•ì‹ì„ ì œê³µ
             FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
             AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
@@ -89,108 +90,43 @@ public class FirebaseAuthMgr : MonoBehaviour
             switch (errorCode)
             {
                 case AuthError.MissingEmail:
-                    message = "ÀÌ¸ŞÀÏ ´©¶ô";
+                    message = "ì´ë©”ì¼ ëˆ„ë½";
                     break;
                 case AuthError.MissingPassword:
-                    message = "ÆĞ½º¿öµå ´©¶ô";
+                    message = "íŒ¨ìŠ¤ì›Œë“œ ëˆ„ë½";
                     break;
                 case AuthError.WrongPassword:
-                    message = "ÆĞ½º¿öµå Æ²¸²";
+                    message = "íŒ¨ìŠ¤ì›Œë“œ í‹€ë¦¼";
                     break;
                 case AuthError.InvalidEmail:
-                    message = "ÀÌ¸ŞÀÏ Çü½ÄÀÌ ¿ÇÁö ¾ÊÀ½";
+                    message = "ì´ë©”ì¼ í˜•ì‹ì´ ì˜³ì§€ ì•ŠìŒ";
                     break;
                 case AuthError.UserNotFound:
-                    message = "¾ÆÀÌµğ°¡ Á¸ÀçÇÏÁö ¾ÊÀ½";
+                    message = "ì•„ì´ë””ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ";
                     break;
                 default:
-                    message = "°ü¸®ÀÚ¿¡°Ô ¹®ÀÇ ¹Ù¶ø´Ï´Ù";
+                    message = "ê´€ë¦¬ìì—ê²Œ ë¬¸ì˜ ë°”ëë‹ˆë‹¤";
                     break;
             }
             warningText.text = message;
         }
-        else// ±×·¸Áö ¾Ê´Ù¸é ·Î±×ÀÎ
+        else// ê·¸ë ‡ì§€ ì•Šë‹¤ë©´ ë¡œê·¸ì¸
         {
-            user = LoginTask.Result.User; //À¯Àú Á¤º¸ ±â¾ï
+            user = LoginTask.Result.User; //ìœ ì € ì •ë³´ ê¸°ì–µ
             warningText.text = "";
             nickField.text = user.DisplayName;
-            confirmText.text = "·Î±×ÀÎ ¿Ï·á, ¹İ°©½À´Ï´Ù " + user.DisplayName + "´Ô";
-            
+            confirmText.text = "ë¡œê·¸ì¸ ì™„ë£Œ, ë°˜ê°‘ìŠµë‹ˆë‹¤ " + user.DisplayName + "ë‹˜";
+
             GameManager.Instance.SceneLoad(SceneName.RoomScene);
         }
     }
+    // ê°„ë‹¨/ì•ˆì „í•œ ì´ë©”ì¼ í˜•ì‹ ê²€ì‚¬ (System.Net.Mail ì‚¬ìš©)
 
-    private IEnumerator RegisterCor(string email, string password, string username)
-    {
-        if (username == "")
-        {
-            warningText.text = "´Ğ³×ÀÓ ¹Ì±âÀÔ";
-        }
-        else
-        {
-            var RegisterTask = auth.CreateUserWithEmailAndPasswordAsync(email, password);
-
-            yield return new WaitUntil(predicate: () => RegisterTask.IsCompleted);
-
-            if (RegisterTask.Exception != null)
-            {
-                Debug.LogWarning(message: "½ÇÆĞ »çÀ¯" + RegisterTask.Exception);
-                FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
-                AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-
-                string message = "È¸¿ø°¡ÀÔ ½ÇÆĞ";
-                switch (errorCode)
-                {
-                    case AuthError.MissingEmail:
-                        message = "ÀÌ¸ŞÀÏ ´©¶ô";
-                        break;
-                    case AuthError.MissingPassword:
-                        message = "ÆĞ½º¿öµå ´©¶ô";
-                        break;
-                    case AuthError.WeakPassword:
-                        message = "ÆĞ½º¿öµå ¾àÇÔ";
-                        break;
-                    case AuthError.EmailAlreadyInUse:
-                        message = "Áßº¹ ÀÌ¸ŞÀÏ";
-                        break;
-                    default:
-                        message = "±âÅ¸ »çÀ¯. °ü¸®ÀÚ ¹®ÀÇ ¹Ù¶÷";
-                        break;
-                }
-                warningText.text = message;
-            }
-            else //»ı¼º ¿Ï·á
-            {
-                user = RegisterTask.Result.User;
-
-                if (user != null)
-                {
-                    UserProfile profile = new UserProfile { DisplayName = username };
-
-                    //ÆÄÀÌ¾îº£ÀÌ½º¿¡ ´Ğ³×ÀÓ Á¤º¸ ¿Ã¸²
-                    Task ProfileTask = user.UpdateUserProfileAsync(profile);
-                    yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
-
-                    if (ProfileTask.Exception != null)
-                    {
-                        Debug.LogWarning(message: "´Ğ³×ÀÓ ¼³Á¤ ½ÇÆĞ" + ProfileTask.Exception);
-                        FirebaseException firebaseEx = ProfileTask.Exception.GetBaseException() as FirebaseException;
-                        AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-                        warningText.text = "´Ğ³×ÀÓ ¼³Á¤ ½ÇÆĞ";
-                    }
-                    else
-                    {
-                        warningText.text = "";
-                        confirmText.text = "»ı¼º ¿Ï·á, ¹İ°©½À´Ï´Ù " + user.DisplayName + "´Ô";
-                        RegisterUI.SetActive(false); //È¸¿ø°¡ÀÔ UI ºñÈ°¼ºÈ­
-                    }
-                }
-            }
-        }
-    }
+    
 
     public void TestLogin()
     {
+
         GameManager.Instance.SceneLoad(SceneName.RoomScene);
     }
 }
