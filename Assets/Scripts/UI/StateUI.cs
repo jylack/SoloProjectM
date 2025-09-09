@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class StateUI : MonoBehaviour
 {
@@ -17,20 +16,23 @@ public class StateUI : MonoBehaviour
     {
         StartCoroutine(PlayerSetting());
     }
-    
+
 
     IEnumerator PlayerSetting()
     {
-        yield return new WaitUntil(() => GameManager.Instance.GetPlayer() != null); // ÀüÅõ ½ÃÀÛ ´ë±â
-        //¸ğµç Ãß°¡´É·ÂÄ¡ ´Ù ÇÕÃÄÁø°Å È£Ãâ
+        Debug.Log("StateUI - PlayerSetting");
+        yield return new WaitUntil(() => GameManager.Instance.GetPlayer() != null); // ì „íˆ¬ ì‹œì‘ ëŒ€ê¸°
+        //ëª¨ë“  ì¶”ê°€ëŠ¥ë ¥ì¹˜ ë‹¤ í•©ì³ì§„ê±° í˜¸ì¶œ
         player = GameManager.Instance.GetPlayer().GetStats();
 
-        LvlText.text =  "LV." + player.Lv.ToString();
-        HpText.text = player.CurrentHp.ToString() +"/" + player.MaxHp.ToString();
+        LvlText.text = "LV." + player.Lv.ToString();
+        HpText.text = player.CurrentHp.ToString() + "/" + player.MaxHp.ToString();
         AtkText.text = player.Attack.ToString();
         DefText.text = player.Defense.ToString();
+        Debug.Log(AtkText.text);
+        Debug.Log(DefText.text);
     }
 
-    //ÃßÈÄ 1¸¸ ³Ñ¾î°¡¸é K ´ÜÀ§·Î ³ª´­°ÅÀÓ
+    //ì¶”í›„ 1ë§Œ ë„˜ì–´ê°€ë©´ K ë‹¨ìœ„ë¡œ ë‚˜ëˆŒê±°ì„
 
 }

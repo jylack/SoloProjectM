@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "976452814430",
+    "project_id": "soloprojm",
+    "storage_bucket": "soloprojm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976452814430:android:4bb14f5fd40ce80065d6cf",
+        "android_client_info": {
+          "package_name": "com.JYL.AdventureKingGO"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqBU8yyhEiIumblBKS0iCJKnOPylwpdeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
