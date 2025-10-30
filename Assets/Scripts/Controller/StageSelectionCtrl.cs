@@ -1,59 +1,59 @@
 
- using System.Collections.Generic;
- using UnityEngine;
- 
- public class StageSelectionCtrl : MonoBehaviour
- {
-     private RectTransform contentRoot;     // ScrollView > Content
-     [SerializeField] private StageButton stageButtonPrefab;  // StageButton 프리팹
-     [SerializeField] private List<StageDefinition> stages;  // 1스테이지, 2스테이지 SO 리스트
- 
-     private void Awake()
-     {
-         contentRoot = GetComponent<RectTransform>();    
-     }
- 
-     private void Start()
-     {
+using System.Collections.Generic;
+using UnityEngine;
 
-      if (StageManager.Instance != null)
-      {
-          StageManager.Instance.ConfigureStages(stages, true);
-      }
-      else
-      {
-          Debug.LogWarning("StageSelectionCtrl: StageManager instance is missing.");
-      }
+public class StageSelectionCtrl : MonoBehaviour
+{
+    private RectTransform contentRoot;     // ScrollView > Content
+    [SerializeField] private StageButton stageButtonPrefab;  // StageButton 프리팹
+    [SerializeField] private List<StageDefinition> stages;  // 1스테이지, 2스테이지 SO 리스트
 
-      PopulateStageList();
-     }
- 
-     private void PopulateStageList()
-     {
-      if (contentRoot == null)
-      {
-          Debug.LogError("StageSelectionCtrl: Content root is not assigned.");
-          return;
-      }
+    private void Awake()
+    {
+        contentRoot = GetComponent<RectTransform>();
+    }
 
-      if (stageButtonPrefab == null)
-      {
-          Debug.LogError("StageSelectionCtrl: Stage button prefab is not assigned.");
-          return;
-      }
+    private void Start()
+    {
 
-      for (int i = contentRoot.childCount - 1; i >= 0; i--)
-      {
-          Destroy(contentRoot.GetChild(i).gameObject);
-      }
+        if (StageManager.Instance != null)
+        {
+            StageManager.Instance.ConfigureStages(stages, true);
+        }
+        else
+        {
+            Debug.LogWarning("StageSelectionCtrl: StageManager instance is missing.");
+        }
 
-      foreach (var def in stages)
-      {
-          if (def == null)
-              continue;
+        PopulateStageList();
+    }
 
-          var button = Instantiate(stageButtonPrefab, contentRoot);
-          button.Initialize(def);
-         }
-     }
- }
+    private void PopulateStageList()
+    {
+        if (contentRoot == null)
+        {
+            Debug.LogError("StageSelectionCtrl: Content root is not assigned.");
+            return;
+        }
+
+        if (stageButtonPrefab == null)
+        {
+            Debug.LogError("StageSelectionCtrl: Stage button prefab is not assigned.");
+            return;
+        }
+
+        for (int i = contentRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(contentRoot.GetChild(i).gameObject);
+        }
+
+        foreach (var def in stages)
+        {
+            if (def == null)
+                continue;
+
+            var button = Instantiate(stageButtonPrefab, contentRoot);
+            button.Initialize(def);
+        }
+    }
+}
