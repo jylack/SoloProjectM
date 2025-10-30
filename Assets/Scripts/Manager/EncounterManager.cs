@@ -26,6 +26,8 @@ public class EncounterManager : MonoBehaviour
         if ((StageManager.Instance != null))
         {
             StageManager.Instance.OnStageDayChanged.AddListener(SetupForDay);
+            // StageManager가 이미 초기화되어 있다면 즉시 첫 데이터 세트를 로드한다.
+            SetupForDay(StageManager.Instance.CurrentStage, StageManager.Instance.CurrentDay);
         }
         else
         {
@@ -49,6 +51,8 @@ public class EncounterManager : MonoBehaviour
         _todayData = table.dailyData.Find(d => d.stage == stage && d.day == day);
         if (_todayData == null)
             Debug.LogWarning($"EncounterTable에 Stage {stage}, Day {day} 설정이 없습니다.");
+        else
+            Debug.Log($"EncounterManager: Stage {stage}, Day {day} 데이터 로드 완료 (몬스터 {(_todayData.possibleMonsters?.Count ?? 0)}종).");
     }
 
     /// <summary>
@@ -58,7 +62,17 @@ public class EncounterManager : MonoBehaviour
     {
         var result = new List<MonsterDefinition>();
 
-        if (_todayData == null || _todayData.possibleMonsters.Count == 0)
+
+        if (_todayData == null)
+        {
+            Debug.LogError("EncounterManager: 오늘자 인카운터 데이터가 비어 있습니다. Stage/Day 설정이 올바르게 초기화되었는지 확인하세요.");
+            return result;
+        }
+
+        //if (_todayData == null || _todayData.possibleMonsters.Count == 0)
+        //    return result;
+
+        if (_todayData.possibleMonsters == null || _todayData.possibleMonsters.Count == 0)
             return result;
 
         // 전체 가중치 합산

@@ -22,9 +22,9 @@ public class LogUI : MonoBehaviour
 
     public void AddDayLog(int day, string message)
     {        
-        Debug.Log(scrollRect.gameObject.name);
-        Debug.Log(contentRoot.gameObject.name);
-        Debug.Log(logPool.gameObject.name);
+        //Debug.Log(scrollRect.gameObject.name);
+        //Debug.Log(contentRoot.gameObject.name);
+        //Debug.Log(logPool.gameObject.name);
 
         var entry = logPool.Get();
         entry.transform.SetParent(contentRoot, false);
