@@ -1,5 +1,6 @@
 using Firebase;
 using Firebase.Auth;
+using Firebase.Database;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -17,13 +18,15 @@ public class RegisterUI : MonoBehaviour
 
     FirebaseUser _user;  //인증된 유저 정보. 웹개발로 치면 토큰같은 느낌
     FirebaseAuth _auth;  //인증 진행을 위한 정보
+    DatabaseReference _databaseRoot; // 실시간 DB 루트 참조
 
-    public void Setting(FirebaseUser user, FirebaseAuth auth, Text waring, Text confirm)
+    public void Setting(FirebaseUser user, FirebaseAuth auth, Text waring, Text confirm, DatabaseReference databaseRoot)
     {
         _user = user;
         _auth = auth;
         warningText = waring;
         confirmText = confirm;
+        _databaseRoot = databaseRoot;
     }
 
     public void StartRegister()
@@ -131,6 +134,28 @@ public class RegisterUI : MonoBehaviour
                 Debug.LogWarning("닉네임 설정 실패 : " + profileTask.Exception);
                 warningText.text = "닉네임 설정 실패";
                 yield break;
+            }
+
+            if (_databaseRoot != null)
+            {
+                var defaultProfile = PlayerProfileData.CreateDefault(_user.UserId, username);
+                string json = JsonUtility.ToJson(defaultProfile);
+                var dbTask = _databaseRoot.Child("users").Child(_user.UserId).SetRawJsonValueAsync(json);
+                yield return new WaitUntil(() => dbTask.IsCompleted);
+                if (dbTask.Exception != null)
+                {
+                    Debug.LogWarning("Realtime DB 저장 실패 : " + dbTask.Exception);
+                    warningText.text = "데이터 저장 실패";
+                    yield break;
+                }
+                else if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetPlayerProfile(defaultProfile);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("RegisterUI - Database reference is null. 기본 프로필을 저장하지 못했습니다.");
             }
 
             warningText.text = "";
