@@ -1,5 +1,6 @@
 using Firebase;
 using Firebase.Auth;
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
@@ -29,26 +30,37 @@ public class FirebaseAuthMgr : MonoBehaviour
 
     private void Awake()
     {
-        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
+            // 1) Firebase 기본 인스턴스
+            var app = FirebaseApp.DefaultInstance;
+
+            // 2) 여기에 네 콘솔에서 본 URL 박기
+            app.Options.DatabaseUrl = new Uri("https://soloprojm-default-rtdb.firebaseio.com/");
+
             var dependencyStatus = task.Result;
-            if (dependencyStatus == Firebase.DependencyStatus.Available)
+
+            if (dependencyStatus == DependencyStatus.Available)
             {
-                auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+                // 3) 인증 인스턴스도 여기서 꺼내기
+                auth = FirebaseAuth.DefaultInstance;
+
+                // (선택) DB 미리 뽑아두고 싶은 경우
+                // var db = FirebaseDatabase.GetInstance(app);
+
+                Debug.Log("[FirebaseAuthMgr] Firebase init + DB URL set");
             }
             else
             {
-                UnityEngine.Debug.LogError(System.String.Format(
-                  "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
-                // Firebase Unity SDK를 사용할 수 없습니다.
+                Debug.LogError($"[FirebaseAuthMgr] Firebase deps error: {dependencyStatus}");
             }
         });
 
+        // 버튼 리스너는 그대로
         LoginBtn.onClick.AddListener(() => { Login(); });
         RegisterBtn.onClick.AddListener(() => { Register(); });
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
     }
-
     private void Start()
     {
         RegisterUI.SetActive(false); //회원가입 UI 비활성화
