@@ -3,6 +3,7 @@
     "project_number": "976452814430",
     "project_id": "soloprojm",
     "storage_bucket": "soloprojm.firebasestorage.app"
+	"firebase_url": "https://soloprojm-default-rtdb.firebaseio.com"
   },
   "client": [
     {
