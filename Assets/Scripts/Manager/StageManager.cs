@@ -71,7 +71,11 @@ public class StageManager : MonoBehaviour
             PushStageDay();
         }
     }
-
+    private void OnEnable()
+    {
+        // 다른 매니저들이 구독을 마친 뒤에도 초기 상태를 다시 한 번 알려준다.
+        PushStageDay();
+    }
     /// <summary>
     /// 외부에서 전달된 스테이지 정의 목록을 StageManager에 등록합니다.
     /// </summary>
