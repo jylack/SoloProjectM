@@ -26,11 +26,17 @@ public class EncounterManager : MonoBehaviour
 
     private void Start()
     {
-        if ((StageManager.Instance != null))
+        var stageManager = StageManager.Instance;
+
+        if (stageManager != null)
         {
-            StageManager.Instance.OnStageDayChanged.AddListener(SetupForDay);
+            stageManager.OnStageDayChanged.AddListener(SetupForDay);
+
             // StageManager가 이미 초기화되어 있다면 즉시 첫 데이터 세트를 로드한다.
-            SetupForDay(StageManager.Instance.CurrentStage, StageManager.Instance.CurrentDay);
+            var initialStage = stageManager.CurrentStage;
+            var initialDay = stageManager.CurrentDay;
+
+            SetupForDay(initialStage, initialDay);
         }
         else
         {

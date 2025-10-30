@@ -114,7 +114,8 @@ public class StageManager : MonoBehaviour
 
         if (selectFirstWhenNoneSelected && stageDefinitions.Count > 0)
         {
-            ApplyStage(stageDefinitions[0], true);
+            ApplyStage(stageDefinitions[0], true, false);
+            PushStageDay();
         }
         else
         {
