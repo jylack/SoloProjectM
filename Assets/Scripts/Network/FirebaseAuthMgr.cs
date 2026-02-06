@@ -30,6 +30,11 @@ public class FirebaseAuthMgr : MonoBehaviour
     public Text warningText;
     public Text confirmText;
 
+    [Header("Auth Emulator (optional)")]
+    [SerializeField] private bool useAuthEmulator;
+    [SerializeField] private string authEmulatorHost = "127.0.0.1";
+    [SerializeField] private int authEmulatorPort = 9099;
+
     private bool _isFirebaseReady;
 
 
@@ -51,6 +56,7 @@ public class FirebaseAuthMgr : MonoBehaviour
 
                 // 3) 인증 인스턴스도 여기서 꺼내기
                 auth = FirebaseAuth.DefaultInstance;
+                ConfigureAuthEmulator();
 
                 _databaseRoot = FirebaseDatabase.GetInstance(app).RootReference;
                 _isFirebaseReady = true;
@@ -71,6 +77,25 @@ public class FirebaseAuthMgr : MonoBehaviour
         LoginBtn.onClick.AddListener(() => { Login(); });
         RegisterBtn.onClick.AddListener(() => { Register(); });
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
+    }
+
+    private void ConfigureAuthEmulator()
+    {
+        if (auth == null)
+        {
+            return;
+        }
+
+        string useEmulatorEnv = Environment.GetEnvironmentVariable("USE_AUTH_EMULATOR");
+        bool hasEnvOptIn = useEmulatorEnv == "1" || string.Equals(useEmulatorEnv, "true", StringComparison.OrdinalIgnoreCase);
+
+        if (!useAuthEmulator && !hasEnvOptIn)
+        {
+            return;
+        }
+
+        auth.UseEmulator(authEmulatorHost, authEmulatorPort);
+        Debug.Log($"[FirebaseAuthMgr] Auth emulator enabled: {authEmulatorHost}:{authEmulatorPort}");
     }
     private void Start()
     {
