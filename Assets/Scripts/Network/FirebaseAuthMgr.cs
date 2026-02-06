@@ -4,12 +4,11 @@ using Firebase.Database;
 using Firebase.Extensions;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-
 
 public class FirebaseAuthMgr : MonoBehaviour
 {
@@ -30,8 +29,16 @@ public class FirebaseAuthMgr : MonoBehaviour
     public Text warningText;
     public Text confirmText;
 
-    private bool _isFirebaseReady;
+    [Header("Auth Emulator (optional)")]
+    [SerializeField] private bool useAuthEmulator;
+    [SerializeField] private string authEmulatorHost = "127.0.0.1";
+    [SerializeField] private int authEmulatorPort = 9099;
 
+    [Header("Profile Load")]
+    [SerializeField] private int profileLoadRetryCount = 2;
+    [SerializeField] private float profileRetryDelaySeconds = 0.25f;
+
+    private bool _isFirebaseReady;
 
     private void Awake()
     {
@@ -43,21 +50,17 @@ public class FirebaseAuthMgr : MonoBehaviour
 
             if (dependencyStatus == DependencyStatus.Available)
             {
-                // 1) Firebase 기본 인스턴스
                 var app = FirebaseApp.DefaultInstance;
-
-                // 2) 여기에 네 콘솔에서 본 URL 박기
                 app.Options.DatabaseUrl = new Uri("https://soloprojm-default-rtdb.firebaseio.com/");
 
-                // 3) 인증 인스턴스도 여기서 꺼내기
                 auth = FirebaseAuth.DefaultInstance;
+                ConfigureAuthEmulator();
 
                 _databaseRoot = FirebaseDatabase.GetInstance(app).RootReference;
                 _isFirebaseReady = true;
                 SetAuthButtonsInteractable(true);
 
                 Debug.Log("[FirebaseAuthMgr] Firebase init + DB URL set");
-
                 TryLoadCurrentUserProfile();
             }
             else
@@ -67,17 +70,37 @@ public class FirebaseAuthMgr : MonoBehaviour
             }
         });
 
-        // 버튼 리스너는 그대로
         LoginBtn.onClick.AddListener(() => { Login(); });
         RegisterBtn.onClick.AddListener(() => { Register(); });
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
     }
+
+    private void ConfigureAuthEmulator()
+    {
+        if (auth == null)
+        {
+            return;
+        }
+
+        string useEmulatorEnv = Environment.GetEnvironmentVariable("USE_AUTH_EMULATOR");
+        bool hasEnvOptIn = useEmulatorEnv == "1" || string.Equals(useEmulatorEnv, "true", StringComparison.OrdinalIgnoreCase);
+
+        if (!useAuthEmulator && !hasEnvOptIn)
+        {
+            return;
+        }
+
+        auth.UseEmulator(authEmulatorHost, authEmulatorPort);
+        Debug.Log($"[FirebaseAuthMgr] Auth emulator enabled: {authEmulatorHost}:{authEmulatorPort}");
+    }
+
     private void Start()
     {
-        RegisterUI.SetActive(false); //회원가입 UI 비활성화
+        RegisterUI.SetActive(false);
         warningText.text = "";
         confirmText.text = "";
     }
+
     public void Login()
     {
         if (!_isFirebaseReady || auth == null)
@@ -97,13 +120,12 @@ public class FirebaseAuthMgr : MonoBehaviour
             return;
         }
 
-        RegisterUI.SetActive(true); //회원가입 UI 활성화
+        RegisterUI.SetActive(true);
         RegisterUI.GetComponent<RegisterUI>().Setting(user, auth, warningText, confirmText, _databaseRoot);
     }
 
     public void CreateID()
     {
-        //StartCoroutine(RegisterCor(emailField.text, pwField.text, nickField.text));
         RegisterUI.GetComponent<RegisterUI>().StartRegister();
     }
 
@@ -115,53 +137,48 @@ public class FirebaseAuthMgr : MonoBehaviour
             yield break;
         }
 
-        Task<AuthResult> LoginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
+        string trimmedEmail = email == null ? string.Empty : email.Trim();
+        string trimmedPassword = password == null ? string.Empty : password.Trim();
 
-        yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
-
-        if (LoginTask.Exception != null)
+        if (string.IsNullOrEmpty(trimmedEmail) || string.IsNullOrEmpty(trimmedPassword))
         {
-            Debug.LogWarning(message: "다음과 같은 이유로 로그인 실패:" + LoginTask.Exception);
-
-            //파이어베이스에선 에러를 분석할 수 있는 형식을 제공
-            FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
-            AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-
-            string message = "";
-            switch (errorCode)
-            {
-                case AuthError.MissingEmail:
-                    message = "이메일 누락";
-                    break;
-                case AuthError.MissingPassword:
-                    message = "패스워드 누락";
-                    break;
-                case AuthError.WrongPassword:
-                    message = "패스워드 틀림";
-                    break;
-                case AuthError.InvalidEmail:
-                    message = "이메일 형식이 옳지 않음";
-                    break;
-                case AuthError.UserNotFound:
-                    message = "아이디가 존재하지 않음";
-                    break;
-                default:
-                    message = "관리자에게 문의 바랍니다";
-                    break;
-            }
-            warningText.text = message;
+            warningText.text = "이메일/비밀번호를 입력해주세요.";
+            yield break;
         }
-        else// 그렇지 않다면 로그인
+
+        Task<AuthResult> loginTask = auth.SignInWithEmailAndPasswordAsync(trimmedEmail, trimmedPassword);
+        yield return new WaitUntil(() => loginTask.IsCompleted);
+
+        if (loginTask.Exception != null)
         {
-            user = LoginTask.Result.User; //유저 정보 기억
-            warningText.text = "";
-            nickField.text = user.DisplayName;
-            confirmText.text = "로그인 완료, 반갑습니다 " + user.DisplayName + "님";
-
-            yield return StartCoroutine(LoadProfileCor(user));
-
-            GameManager.Instance.SceneLoad(SceneName.RoomScene);
+            warningText.text = ConvertLoginErrorMessage(loginTask.Exception);
+            yield break;
         }
+
+        user = loginTask.Result.User;
+        bool profileValidated = false;
+        string profileFailMessage = "프로필 검증 실패";
+
+        yield return StartCoroutine(LoadAndValidateProfileCor(user, trimmedEmail, (ok, message) =>
+        {
+            profileValidated = ok;
+            profileFailMessage = message;
+        }));
+
+        if (!profileValidated)
+        {
+            warningText.text = profileFailMessage;
+            confirmText.text = "";
+            auth.SignOut();
+            user = null;
+            yield break;
+        }
+
+        warningText.text = "";
+        nickField.text = GetSafeNickname(user);
+        confirmText.text = "로그인 완료, 반갑습니다 " + nickField.text + "님";
+
+        GameManager.Instance.SceneLoad(SceneName.RoomScene);
     }
 
     private void TryLoadCurrentUserProfile()
@@ -172,53 +189,181 @@ public class FirebaseAuthMgr : MonoBehaviour
         }
 
         user = auth.CurrentUser;
-        StartCoroutine(LoadProfileCor(user));
+        StartCoroutine(LoadAndValidateProfileCor(user, user.Email, null));
     }
 
-    private IEnumerator LoadProfileCor(FirebaseUser currentUser)
+    private IEnumerator LoadAndValidateProfileCor(FirebaseUser currentUser, string inputEmail, Action<bool, string> onCompleted)
     {
         if (_databaseRoot == null || currentUser == null)
         {
+            onCompleted?.Invoke(false, "프로필 로드 준비가 완료되지 않았습니다.");
             yield break;
         }
 
-        var profileTask = _databaseRoot.Child("users").Child(currentUser.UserId).GetValueAsync();
-        yield return new WaitUntil(() => profileTask.IsCompleted);
-        if (profileTask.Exception != null)
+        DataSnapshot snapshot = null;
+        int maxAttempt = Mathf.Max(1, profileLoadRetryCount);
+
+        for (int attempt = 1; attempt <= maxAttempt; attempt++)
         {
-            Debug.LogWarning("Realtime DB 로드 실패 : " + profileTask.Exception);
+            var profileTask = _databaseRoot.Child("users").Child(currentUser.UserId).GetValueAsync();
+            yield return new WaitUntil(() => profileTask.IsCompleted);
+
+            if (profileTask.Exception != null)
+            {
+                Debug.LogWarning($"Realtime DB 로드 실패 (시도 {attempt}/{maxAttempt}) : {profileTask.Exception}");
+                if (attempt < maxAttempt)
+                {
+                    yield return new WaitForSeconds(profileRetryDelaySeconds);
+                }
+                continue;
+            }
+
+            snapshot = profileTask.Result;
+            break;
+        }
+
+        if (snapshot == null)
+        {
+            onCompleted?.Invoke(false, "프로필 정보를 불러오지 못했습니다.");
             yield break;
         }
 
-        PlayerProfileData profileData = null;
-        if (profileTask.Result.Exists)
+        if (!snapshot.Exists)
         {
-            try
-            {
-                profileData = JsonUtility.FromJson<PlayerProfileData>(profileTask.Result.GetRawJsonValue());
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning("프로필 데이터 역직렬화 실패 : " + ex);
-            }
+            onCompleted?.Invoke(false, "DB에 등록된 유저 데이터가 없습니다.");
+            yield break;
+        }
+
+        string rawJson = snapshot.GetRawJsonValue();
+        if (string.IsNullOrEmpty(rawJson) || rawJson == "null")
+        {
+            onCompleted?.Invoke(false, "DB 유저 데이터가 비어있습니다.");
+            yield break;
+        }
+
+        PlayerProfileData profileData;
+        try
+        {
+            profileData = JsonUtility.FromJson<PlayerProfileData>(rawJson);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("프로필 데이터 역직렬화 실패 : " + ex);
+            onCompleted?.Invoke(false, "DB 유저 데이터 형식이 올바르지 않습니다.");
+            yield break;
         }
 
         if (profileData == null)
         {
-            profileData = PlayerProfileData.CreateDefault(currentUser.UserId, currentUser.DisplayName);
-            string json = JsonUtility.ToJson(profileData);
-            var createTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(json);
-            yield return new WaitUntil(() => createTask.IsCompleted);
-            if (createTask.Exception != null)
-            {
-                Debug.LogWarning("Realtime DB 기본 데이터 저장 실패 : " + createTask.Exception);
-            }
+            onCompleted?.Invoke(false, "DB 유저 데이터가 손상되었습니다.");
+            yield break;
+        }
+
+        NormalizeProfile(profileData, currentUser);
+
+        string authEmail = currentUser.Email == null ? string.Empty : currentUser.Email.Trim();
+        string loginEmail = inputEmail == null ? string.Empty : inputEmail.Trim();
+
+        if (!string.Equals(authEmail, loginEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            onCompleted?.Invoke(false, "계정 이메일 검증에 실패했습니다.");
+            yield break;
+        }
+
+        if (!string.IsNullOrEmpty(profileData.uid) && !string.Equals(profileData.uid, currentUser.UserId, StringComparison.Ordinal))
+        {
+            onCompleted?.Invoke(false, "DB 유저 정보와 인증 정보가 일치하지 않습니다.");
+            yield break;
         }
 
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SetPlayerProfile(profileData);
         }
+
+        onCompleted?.Invoke(true, string.Empty);
+    }
+
+    private string ConvertLoginErrorMessage(AggregateException exception)
+    {
+        Debug.LogWarning("다음과 같은 이유로 로그인 실패:" + exception);
+
+        FirebaseException firebaseEx = exception.GetBaseException() as FirebaseException;
+        if (firebaseEx == null)
+        {
+            return "로그인 실패. 네트워크 상태를 확인해주세요.";
+        }
+
+        AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+        switch (errorCode)
+        {
+            case AuthError.MissingEmail:
+                return "이메일 누락";
+            case AuthError.MissingPassword:
+                return "패스워드 누락";
+            case AuthError.WrongPassword:
+                return "패스워드 틀림";
+            case AuthError.InvalidEmail:
+                return "이메일 형식이 옳지 않음";
+            case AuthError.UserNotFound:
+                return "아이디가 존재하지 않음";
+            default:
+                return "관리자에게 문의 바랍니다";
+        }
+    }
+
+    private void NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser)
+    {
+        if (string.IsNullOrEmpty(profileData.uid))
+        {
+            profileData.uid = currentUser.UserId;
+        }
+
+        if (string.IsNullOrEmpty(profileData.nickname))
+        {
+            profileData.nickname = GetSafeNickname(currentUser);
+        }
+
+        if (profileData.stats == null)
+        {
+            profileData.stats = PlayerStatsData.CreateDefault();
+        }
+
+        if (profileData.items == null)
+        {
+            profileData.items = new List<PlayerItemData>();
+        }
+
+        if (profileData.skills == null)
+        {
+            profileData.skills = new List<PlayerSkillData>();
+        }
+    }
+
+    private string GetSafeNickname(FirebaseUser currentUser)
+    {
+        if (currentUser == null)
+        {
+            return "Player";
+        }
+
+        if (!string.IsNullOrEmpty(currentUser.DisplayName))
+        {
+            return currentUser.DisplayName;
+        }
+
+        if (!string.IsNullOrEmpty(currentUser.Email))
+        {
+            int atIndex = currentUser.Email.IndexOf('@');
+            if (atIndex > 0)
+            {
+                return currentUser.Email.Substring(0, atIndex);
+            }
+
+            return currentUser.Email;
+        }
+
+        return "Player";
     }
 
     private void SetAuthButtonsInteractable(bool interactable)
@@ -238,13 +383,9 @@ public class FirebaseAuthMgr : MonoBehaviour
             CreateIDBtn.interactable = interactable;
         }
     }
-    // 간단/안전한 이메일 형식 검사 (System.Net.Mail 사용)
-
-    
 
     public void TestLogin()
     {
-
         GameManager.Instance.SceneLoad(SceneName.RoomScene);
     }
 }
