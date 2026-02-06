@@ -204,7 +204,22 @@ public class FirebaseAuthMgr : MonoBehaviour
 
         if (!snapshot.Exists)
         {
-            onCompleted?.Invoke(false, "DB에 등록된 유저 데이터가 없습니다.");
+            bool bootstrapSucceeded = false;
+            string bootstrapErrorMessage = "DB에 등록된 유저 데이터가 없습니다.";
+
+            yield return StartCoroutine(BootstrapMissingProfileCor(currentUser, (ok, message) =>
+            {
+                bootstrapSucceeded = ok;
+                bootstrapErrorMessage = message;
+            }));
+
+            if (!bootstrapSucceeded)
+            {
+                onCompleted?.Invoke(false, bootstrapErrorMessage);
+                yield break;
+            }
+
+            onCompleted?.Invoke(true, string.Empty);
             yield break;
         }
 
@@ -312,6 +327,37 @@ public class FirebaseAuthMgr : MonoBehaviour
         {
             profileData.skills = new List<PlayerSkillData>();
         }
+    }
+
+    private IEnumerator BootstrapMissingProfileCor(FirebaseUser currentUser, Action<bool, string> onCompleted)
+    {
+        if (_databaseRoot == null || currentUser == null)
+        {
+            onCompleted?.Invoke(false, "프로필 복구 준비가 완료되지 않았습니다.");
+            yield break;
+        }
+
+        string nickname = GetSafeNickname(currentUser);
+        var defaultProfile = PlayerProfileData.CreateDefault(currentUser.UserId, nickname);
+        string json = JsonUtility.ToJson(defaultProfile);
+
+        var saveTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(json);
+        yield return new WaitUntil(() => saveTask.IsCompleted);
+
+        if (saveTask.Exception != null)
+        {
+            Debug.LogWarning("누락된 프로필 자동 복구 실패 : " + saveTask.Exception);
+            onCompleted?.Invoke(false, "프로필 복구에 실패했습니다.");
+            yield break;
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetPlayerProfile(defaultProfile);
+        }
+
+        Debug.Log("[FirebaseAuthMgr] 누락된 유저 프로필 자동 복구 완료");
+        onCompleted?.Invoke(true, string.Empty);
     }
 
     private string GetSafeNickname(FirebaseUser currentUser)
