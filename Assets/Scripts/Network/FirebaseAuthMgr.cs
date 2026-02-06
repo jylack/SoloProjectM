@@ -275,6 +275,21 @@ public class FirebaseAuthMgr : MonoBehaviour
             onCompleted?.Invoke(false, "DB 유저 정보와 인증 정보가 일치하지 않습니다.");
             yield break;
         }
+        else
+        {
+            bool wasUpdated;
+            profileData = NormalizeProfile(profileData, currentUser, out wasUpdated);
+            if (wasUpdated)
+            {
+                string normalizedJson = JsonUtility.ToJson(profileData);
+                var updateTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(normalizedJson);
+                yield return new WaitUntil(() => updateTask.IsCompleted);
+                if (updateTask.Exception != null)
+                {
+                    Debug.LogWarning("프로필 정규화 데이터 저장 실패 : " + updateTask.Exception);
+                }
+            }
+        }
 
         if (GameManager.Instance != null)
         {
@@ -338,6 +353,75 @@ public class FirebaseAuthMgr : MonoBehaviour
         {
             profileData.skills = new List<PlayerSkillData>();
         }
+    }
+
+    private string GetSafeNickname(FirebaseUser currentUser)
+    {
+        if (currentUser == null)
+        {
+            return "Player";
+        }
+
+        if (!string.IsNullOrEmpty(currentUser.DisplayName))
+        {
+            return currentUser.DisplayName;
+        }
+
+        if (!string.IsNullOrEmpty(currentUser.Email))
+        {
+            int atIndex = currentUser.Email.IndexOf('@');
+            if (atIndex > 0)
+            {
+                return currentUser.Email.Substring(0, atIndex);
+            }
+
+            return currentUser.Email;
+        }
+
+        return "Player";
+    }
+
+    private PlayerProfileData NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser, out bool wasUpdated)
+    {
+        wasUpdated = false;
+
+        if (profileData == null)
+        {
+            wasUpdated = true;
+            return PlayerProfileData.CreateDefault(currentUser.UserId, GetSafeNickname(currentUser));
+        }
+
+        if (string.IsNullOrEmpty(profileData.uid))
+        {
+            profileData.uid = currentUser.UserId;
+            wasUpdated = true;
+        }
+
+        if (string.IsNullOrEmpty(profileData.nickname))
+        {
+            profileData.nickname = GetSafeNickname(currentUser);
+            wasUpdated = true;
+        }
+
+        if (profileData.stats == null)
+        {
+            profileData.stats = PlayerStatsData.CreateDefault();
+            wasUpdated = true;
+        }
+
+        if (profileData.items == null)
+        {
+            profileData.items = new List<PlayerItemData>();
+            wasUpdated = true;
+        }
+
+        if (profileData.skills == null)
+        {
+            profileData.skills = new List<PlayerSkillData>();
+            wasUpdated = true;
+        }
+
+        return profileData;
     }
 
     private string GetSafeNickname(FirebaseUser currentUser)
