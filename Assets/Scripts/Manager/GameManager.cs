@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public enum SceneName
 {
     TitleScene,
@@ -9,13 +10,10 @@ public enum SceneName
 
 public class GameManager : MonoBehaviour
 {
-
     public static GameManager Instance { get; set; }
 
     public Player PlayerState;
     public PlayerProfileData PlayerProfile { get; private set; }
-
-    public int CurrentDay = 1; // 현재 날짜
 
     private void Awake()
     {

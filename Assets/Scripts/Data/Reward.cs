@@ -1,5 +1,5 @@
 ﻿
-public enum RewardType
+public enum LegacyRewardType
 {
     Skill = 0, // 스킬 보상
     Gold = 1, // 골드 보상
@@ -14,10 +14,10 @@ public class Reward
     public string name; // 보상 이름
     public string description; // 보상 설명
     public int amount; // 보상 수량
-    public RewardType type; // 보상 타입 (0: 스킬, 1: 골드, 2: 경험치, 3: 스텟(공,방))
+    public LegacyRewardType type; // 보상 타입 (0: 스킬, 1: 골드, 2: 경험치, 3: 스텟(공,방))
     public int value; // 보상 값 (아이템 ID, 골드 양, 경험치 양 등)
     public bool isClaimed; // 보상 수령 여부
-    public Reward(int id, string name, string description, int amount, RewardType type, int value)
+    public Reward(int id, string name, string description, int amount, LegacyRewardType type, int value)
     {
         this.id = id;
         this.name = name;
@@ -28,4 +28,3 @@ public class Reward
         this.isClaimed = false;
     }
 }
-

@@ -1,9 +1,7 @@
-// BattleManager.cs
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
@@ -12,11 +10,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Transform monsterTransform;
     [SerializeField] private ParallaxBackground parallaxBackground;
     [SerializeField] private GameObject LogUIObj;
-    [SerializeField] private StageManager stageManager;
-    [SerializeField] private EncounterManager encounterManager;
 
     [Header("Timing")]
-    [SerializeField] private float moveDuration = 5.5f;
+    [SerializeField] private float moveDuration = 1.2f;
     [SerializeField] private float attackDelay = 0.5f;
 
     private LogUI _logUI;
@@ -26,24 +22,22 @@ public class BattleManager : MonoBehaviour
     private ICombatant _monsterStats;
     private Queue<ICombatant> _turnQueue;
     private Animator _monsterAnimator;
-    private MonsterDefinition _currentMonsterDefinition;
     private bool _playerHpBound;
-
-    Coroutine combat = null;
+    private UnitStats _runtimePlayerStats;
+    private EncounterData _currentEncounter;
+    private InGameSceneController _sceneController;
 
     private void Awake()
     {
-        _logUI = LogUIObj.GetComponent<LogUI>();
-    }
+        if (LogUIObj != null)
+        {
+            _logUI = LogUIObj.GetComponent<LogUI>();
+        }
 
-
-    private void Start()
-    {
-        // 컴포넌트 & 스탯 초기화
-        EnsureManagerReferences();
-        _player = playerTransform.GetComponent<Player>();
-        _playerStats = _player.GetStats();
-        combat = StartCoroutine(StartBattleSequence());
+        if (playerTransform != null)
+        {
+            _player = playerTransform.GetComponent<Player>();
+        }
     }
 
     private void OnDestroy()
@@ -51,6 +45,7 @@ public class BattleManager : MonoBehaviour
         if (_playerHpBound && _playerStats != null)
         {
             _playerStats.OnHpChanged -= OnPlayerHpChanged;
+            _playerHpBound = false;
         }
 
         if (_monsterStats != null)
@@ -59,196 +54,120 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void EnsureManagerReferences()
+    public void StartEncounterBattle(EncounterData encounterData, InGameSceneController sceneController)
     {
-        if (stageManager == null)
-            stageManager = StageManager.Instance;
+        if (encounterData == null)
+        {
+            sceneController?.OnBattleFinished(new BattleResult { isWin = false });
+            return;
+        }
 
-        if (encounterManager == null)
-            encounterManager = EncounterManager.Instance;
+        _currentEncounter = encounterData;
+        _sceneController = sceneController;
+
+        StopAllCoroutines();
+        StartCoroutine(StartBattleSequence());
     }
 
     private IEnumerator StartBattleSequence()
     {
-        Debug.Log("전투 시작 시퀀스 시작");
-        EnsureManagerReferences();
-
-        if (stageManager == null)
+        if (_player == null && playerTransform != null)
         {
-            yield return new WaitUntil(() => StageManager.Instance != null);
-            stageManager = StageManager.Instance;
+            _player = playerTransform.GetComponent<Player>();
         }
 
-        if (encounterManager == null)
+        if (_player == null)
         {
-            yield return new WaitUntil(() => EncounterManager.Instance != null);
-            encounterManager = EncounterManager.Instance;
-        }
-
-        if (!PrepareMonsterForToday())
-        {
+            _sceneController?.OnBattleFinished(new BattleResult { isWin = false });
             yield break;
         }
 
-        if (UIManager.Instance == null)
-            yield return new WaitUntil(() => UIManager.Instance != null);
-        // HP 변경 UI 바인딩
+        BuildPlayerStats();
+
+        if (!PrepareMonsterForEncounter(_currentEncounter))
+        {
+            _sceneController?.OnBattleFinished(new BattleResult { isWin = false, remainingHp = RunManager.Instance.RunState.stats.currentHp });
+            yield break;
+        }
+
         BindHpEvents();
 
-        Debug.Log("전투 시작 시퀀스");
+        if (_logUI != null)
+        {
+            _logUI.AddDayLog(_currentEncounter.day, "Battle Start");
+        }
 
-        // 전투 시작 로그
-        int currentDay = stageManager != null ? stageManager.CurrentDay : 0;
-        _logUI.AddDayLog(currentDay, "전투 시작!");
+        if (playerTransform != null)
+        {
+            yield return MoveOverTime(playerTransform, playerTransform.position, playerTransform.position + Vector3.right * 1f, moveDuration);
+        }
 
-        Debug.Log(playerTransform.gameObject.name);
-
-        // 연출 플레이어/몬스터 접근
-        yield return MoveOverTime(playerTransform, playerTransform.position,
-                                 playerTransform.position + Vector3.right * 1f, moveDuration);
-
-        Debug.Log(monsterTransform.gameObject.name);
-
-        var monsterStart = monsterTransform.position + Vector3.right * 2.5f;
-
-        yield return MoveOverTime(monsterTransform, monsterStart,
-                                 monsterStart + Vector3.left * 3.5f, moveDuration);
+        if (monsterTransform != null)
+        {
+            var monsterStart = monsterTransform.position + Vector3.right * 2.5f;
+            yield return MoveOverTime(monsterTransform, monsterStart, monsterStart + Vector3.left * 3.5f, moveDuration);
+        }
 
         yield return new WaitForSeconds(attackDelay);
-        parallaxBackground.cameraMove = false;
 
-        // 턴 큐 초기화 & 전투 루프 시작
+        if (parallaxBackground != null)
+        {
+            parallaxBackground.cameraMove = false;
+        }
+
         InitTurnQueue();
-        StartCoroutine(CombatLoop());
+        yield return CombatLoop();
     }
 
-    private void InitTurnQueue()
+    private void BuildPlayerStats()
     {
-        // 속도 내림차순 정렬 후 큐에 넣기
-        var ordered = new List<ICombatant> { _playerStats, _monsterStats }
-                      .OrderByDescending(u => u.Speed);
-        _turnQueue = new Queue<ICombatant>(ordered);
+        var runStats = RunManager.Instance != null ? RunManager.Instance.RunState.stats : null;
+        if (runStats == null)
+        {
+            _runtimePlayerStats = _player.GetStats() as UnitStats;
+            _playerStats = _runtimePlayerStats;
+            return;
+        }
+
+        int speed = Mathf.Max(1, runStats.attackSpeed);
+        _runtimePlayerStats = new UnitStats("Player", runStats.maxHp, runStats.attack, speed, 1);
+        int missingHp = runStats.maxHp - runStats.currentHp;
+        if (missingHp > 0)
+        {
+            _runtimePlayerStats.TakeDamage(missingHp);
+        }
+
+        _playerStats = _runtimePlayerStats;
     }
 
-    private IEnumerator CombatLoop()
+    private bool PrepareMonsterForEncounter(EncounterData encounterData)
     {
-        while (_turnQueue.Count > 0)
-        {
-            var actor = _turnQueue.Dequeue();
-            var defender = actor == _playerStats ? _monsterStats : _playerStats;
-
-            if (actor.IsDead)
-                continue;
-
-            actor.ResetActions();
-
-            // 남은 행동만큼 반복
-            while (actor.ActionsRemaining > 0 && !defender.IsDead)
-            {
-                // 공격 애니메이션
-                if (actor == _playerStats)
-                {
-                    _player.SetAnim(PlayerState.ATTACK);
-                }
-                else PlayMonsterAnimation(MonsterState.Atk1);
-
-
-
-                // 피해 적용
-                defender.TakeDamage(actor.Attack);
-                _logUI.AddLog($"{actor.Name} → {defender.Name} : {actor.Attack} 피해");
-
-                actor.ActionsRemaining--;
-                yield return new WaitForSeconds(attackDelay);
-            }
-
-            // 사망 처리
-            if (defender.IsDead)
-            {
-                yield return HandleDeath(defender);
-
-                yield break;
-            }
-
-            // 다시 큐에 넣기
-            if (!actor.IsDead)
-                _turnQueue.Enqueue(actor);
-
-            yield return new WaitForSeconds(attackDelay);
-        }
-    }
-
-
-    private IEnumerator EndBattleRoutine()
-    {
-        EnsureManagerReferences();
-
-        if (stageManager != null)
-        {
-            stageManager.AdvanceDay();
-            _logUI.AddDayLog(stageManager.CurrentDay, $"Stage {stageManager.CurrentStage}");
-        }
-        else
-        {
-            Debug.LogWarning("BattleManager: StageManager reference missing when ending battle.");
-        }
-
-        combat = StartCoroutine(StartBattleSequence());
-        yield return null;
-    }
-
-    private IEnumerator HandleDeath(ICombatant fallen)
-    {
-        if (fallen == _playerStats)
-        {
-            _player.SetAnim(PlayerState.DEATH);
-            _logUI.AddLog("YOU DIED");
-
-            yield return new WaitForSeconds(1f);
-
-            SceneManager.LoadScene(nameof(SceneNames.RoomScene));
-        }
-        else
-        {
-            PlayMonsterAnimation(MonsterState.Death);
-            _logUI.AddLog($"{fallen.Name} 처치!");
-
-            yield return new WaitForSeconds(1f);
-
-            DestroyCurrentMonster();
-            parallaxBackground.cameraMove = true;
-            yield return EndBattleRoutine();
-        }
-    }
-
-    private bool PrepareMonsterForToday()
-    {
-        if (encounterManager == null)
-        {
-            Debug.LogWarning("BattleManager: EncounterManager reference is missing.");
-            return false;
-        }
-
-        var encounters = encounterManager.GetRandomEncounters(1);
-        if (encounters == null || encounters.Count == 0)
-        {
-            Debug.LogWarning("BattleManager: No monster definitions available for today's encounter.");
-            return false;
-        }
-
-        var monsterDefinition = encounters[0];
-        if (monsterDefinition == null)
-        {
-            Debug.LogWarning("BattleManager: EncounterManager returned a null MonsterDefinition.");
-            return false;
-        }
-
         ClearExistingMonster();
 
-        MonsterBase spawned = MonsterFactory.Spawn(monsterDefinition, monsterTransform, Vector3.zero);
+        var candidates = Resources.LoadAll<MonsterDefinition>("");
+        if (candidates == null || candidates.Length == 0)
+        {
+            return false;
+        }
+
+        int index = Mathf.Abs((encounterData.day * 7) + encounterData.encounterType.GetHashCode()) % candidates.Length;
+        var selected = candidates[index];
+        if (selected == null || selected.prefab == null)
+        {
+            return false;
+        }
+
+        MonsterDefinition runtimeDef = ScriptableObject.CreateInstance<MonsterDefinition>();
+        runtimeDef.monsterName = selected.monsterName;
+        runtimeDef.prefab = selected.prefab;
+        runtimeDef.maxHp = selected.maxHp + (encounterData.day * (encounterData.encounterType == EncounterType.Boss ? 20 : 8));
+        runtimeDef.attack = selected.attack + (encounterData.day * (encounterData.encounterType == EncounterType.Boss ? 3 : 1));
+        runtimeDef.speed = Mathf.Max(1, selected.speed);
+        runtimeDef.attackCount = Mathf.Max(1, selected.attackCount);
+
+        MonsterBase spawned = MonsterFactory.Spawn(runtimeDef, monsterTransform, Vector3.zero);
         if (spawned == null)
         {
-            Debug.LogError("BattleManager: Failed to spawn monster from definition.");
             return false;
         }
 
@@ -260,9 +179,115 @@ public class BattleManager : MonoBehaviour
             _monsterAnimator = spawned.GetComponentInChildren<Animator>();
         }
 
-        _currentMonsterDefinition = monsterDefinition;
-
         return true;
+    }
+
+    private void InitTurnQueue()
+    {
+        var ordered = new List<ICombatant> { _playerStats, _monsterStats }.OrderByDescending(u => u.Speed);
+        _turnQueue = new Queue<ICombatant>(ordered);
+    }
+
+    private IEnumerator CombatLoop()
+    {
+        while (_turnQueue.Count > 0)
+        {
+            var actor = _turnQueue.Dequeue();
+            var defender = actor == _playerStats ? _monsterStats : _playerStats;
+
+            if (actor.IsDead)
+            {
+                continue;
+            }
+
+            actor.ResetActions();
+
+            while (actor.ActionsRemaining > 0 && !defender.IsDead)
+            {
+                if (actor == _playerStats)
+                {
+                    _player.SetAnim(PlayerState.ATTACK);
+                }
+                else
+                {
+                    PlayMonsterAnimation(MonsterState.Atk1);
+                }
+
+                defender.TakeDamage(actor.Attack);
+                if (_logUI != null)
+                {
+                    _logUI.AddLog(actor.Name + " -> " + defender.Name + " : " + actor.Attack);
+                }
+
+                actor.ActionsRemaining--;
+                yield return new WaitForSeconds(attackDelay);
+            }
+
+            if (defender.IsDead)
+            {
+                yield return HandleDeath(defender);
+                yield break;
+            }
+
+            if (!actor.IsDead)
+            {
+                _turnQueue.Enqueue(actor);
+            }
+
+            yield return new WaitForSeconds(attackDelay);
+        }
+    }
+
+    private IEnumerator HandleDeath(ICombatant fallen)
+    {
+        if (fallen == _playerStats)
+        {
+            _player.SetAnim(PlayerState.DEATH);
+            if (_logUI != null)
+            {
+                _logUI.AddLog("Defeat");
+            }
+
+            yield return new WaitForSeconds(1f);
+            ReportBattleFinished(false);
+        }
+        else
+        {
+            PlayMonsterAnimation(MonsterState.Death);
+            if (_logUI != null)
+            {
+                _logUI.AddLog("Victory");
+            }
+
+            yield return new WaitForSeconds(1f);
+            DestroyCurrentMonster();
+
+            if (parallaxBackground != null)
+            {
+                parallaxBackground.cameraMove = true;
+            }
+
+            ReportBattleFinished(true);
+        }
+    }
+
+    private void ReportBattleFinished(bool isWin)
+    {
+        var result = new BattleResult
+        {
+            isWin = isWin,
+            remainingHp = _runtimePlayerStats != null ? _runtimePlayerStats.CurrentHp : 0,
+            rewards = isWin && _currentEncounter != null && _currentEncounter.rewards != null
+                ? new List<RewardData>(_currentEncounter.rewards)
+                : new List<RewardData>(),
+        };
+
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.SetCurrentHp(result.remainingHp);
+        }
+
+        _sceneController?.OnBattleFinished(result);
     }
 
     private void ClearExistingMonster()
@@ -275,7 +300,11 @@ public class BattleManager : MonoBehaviour
 
         _monster = null;
         _monsterAnimator = null;
-        _currentMonsterDefinition = null;
+
+        if (monsterTransform == null)
+        {
+            return;
+        }
 
         for (int i = monsterTransform.childCount - 1; i >= 0; i--)
         {
@@ -301,17 +330,7 @@ public class BattleManager : MonoBehaviour
             _monster = null;
         }
 
-        for (int i = monsterTransform.childCount - 1; i >= 0; i--)
-        {
-            var child = monsterTransform.GetChild(i);
-            if (child != null)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-
         _monsterAnimator = null;
-        _currentMonsterDefinition = null;
     }
 
     private void BindHpEvents()
@@ -320,34 +339,32 @@ public class BattleManager : MonoBehaviour
         {
             _playerStats.OnHpChanged += OnPlayerHpChanged;
             _playerHpBound = true;
-
-            if (UIManager.Instance != null && _playerStats is UnitStats playerStats)
+            if (_runtimePlayerStats != null)
             {
-                UIManager.Instance.UpdatePlayerHp(playerStats.CurrentHp, playerStats.MaxHp);
+                OnPlayerHpChanged(_runtimePlayerStats.CurrentHp, _runtimePlayerStats.MaxHp);
             }
         }
 
         if (_monsterStats != null)
         {
             _monsterStats.OnHpChanged += OnMonsterHpChanged;
-
-            if (UIManager.Instance != null && _currentMonsterDefinition != null)
-            {
-                UIManager.Instance.UpdateMonsterHp(_currentMonsterDefinition.maxHp, _currentMonsterDefinition.maxHp);
-            }
         }
     }
 
     private void OnPlayerHpChanged(int currentHp, int maxHp)
     {
         if (UIManager.Instance != null)
+        {
             UIManager.Instance.UpdatePlayerHp(currentHp, maxHp);
+        }
     }
 
     private void OnMonsterHpChanged(int currentHp, int maxHp)
     {
         if (UIManager.Instance != null)
+        {
             UIManager.Instance.UpdateMonsterHp(currentHp, maxHp);
+        }
     }
 
     private void PlayMonsterAnimation(MonsterState state)
@@ -367,6 +384,7 @@ public class BattleManager : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
         t.position = to;
     }
 }
