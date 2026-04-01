@@ -59,23 +59,23 @@ public class RoomSceneUI : MonoBehaviour
             canvasObject.AddComponent<GraphicRaycaster>();
         }
 
-        var panelObject = new GameObject("RunHudPanel");
-        panelObject.transform.SetParent(canvas.transform, false);
-        var panel = panelObject.AddComponent<VerticalLayoutGroup>();
-        panel.childControlHeight = true;
-        panel.childControlWidth = true;
-        panel.childForceExpandHeight = false;
-        panel.childForceExpandWidth = true;
+        //var panelObject = new GameObject("RunHudPanel");
+        //panelObject.transform.SetParent(canvas.transform, false);
+        //var panel = panelObject.AddComponent<VerticalLayoutGroup>();
+        //panel.childControlHeight = true;
+        //panel.childControlWidth = true;
+        //panel.childForceExpandHeight = false;
+        //panel.childForceExpandWidth = true;
 
-        dayText = CreateText("DayText", panelObject.transform);
-        hpText = CreateText("HpText", panelObject.transform);
-        goldText = CreateText("GoldText", panelObject.transform);
-        attackText = CreateText("AttackText", panelObject.transform);
-        encounterTypeText = CreateText("EncounterTypeText", panelObject.transform);
-        encounterRewardText = CreateText("EncounterRewardText", panelObject.transform);
+        //dayText = CreateText("DayText", panelObject.transform);
+        //hpText = CreateText("HpText", panelObject.transform);
+        //goldText = CreateText("GoldText", panelObject.transform);
+        //attackText = CreateText("AttackText", panelObject.transform);
+        //encounterTypeText = CreateText("EncounterTypeText", panelObject.transform);
+        //encounterRewardText = CreateText("EncounterRewardText", panelObject.transform);
 
-        enterButton = CreateButton("EnterButton", "Enter Encounter", panelObject.transform);
-        rerollButton = CreateButton("RerollButton", "Reroll Disabled", panelObject.transform);
+        //enterButton = CreateButton("EnterButton", "Enter Encounter", panelObject.transform);
+        //rerollButton = CreateButton("RerollButton", "Reroll Disabled", panelObject.transform);
     }
 
     private Text CreateText(string objectName, Transform parent)
