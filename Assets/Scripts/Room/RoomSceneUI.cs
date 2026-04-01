@@ -83,7 +83,22 @@ public class RoomSceneUI : MonoBehaviour
         var textObject = new GameObject(objectName);
         textObject.transform.SetParent(parent, false);
         var text = textObject.AddComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        Font defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (defaultFont == null)
+        {
+            // 런타임에서 내장 폰트를 못찾는 경우 안전하게 프로젝트에 포함된 임의 폰트를 찾아 사용
+            var found = Resources.FindObjectsOfTypeAll<Font>();
+            if (found != null && found.Length > 0)
+            {
+                defaultFont = found[0];
+                Debug.LogWarning("[RoomSceneUI] LegacyRuntime.ttf not found - using first available Font from Resources.");
+            }
+            else
+            {
+                Debug.LogError("[RoomSceneUI] No Font available via Resources. UI 텍스트가 정상 표시되지 않을 수 있습니다.");
+            }
+        }
+        text.font = defaultFont;
         text.color = Color.white;
         text.fontSize = 24;
         return text;
