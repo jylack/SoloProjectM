@@ -1,38 +1,66 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 
 public class StateUI : MonoBehaviour
 {
-    UnitStats player;
+    [SerializeField] private TextMeshProUGUI LvlText;
+    [SerializeField] private TextMeshProUGUI HpText;
+    [SerializeField] private TextMeshProUGUI AtkText;
+    [SerializeField] private TextMeshProUGUI DefText;
 
-    [SerializeField] TextMeshProUGUI LvlText;
-    [SerializeField] TextMeshProUGUI HpText;
-    [SerializeField] TextMeshProUGUI AtkText;
-    [SerializeField] TextMeshProUGUI DefText;
-
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        StartCoroutine(PlayerSetting());
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.StateChanged += Refresh;
+        }
+
+        Refresh();
     }
 
-
-    IEnumerator PlayerSetting()
+    private void OnDisable()
     {
-        Debug.Log("StateUI - PlayerSetting");
-        yield return new WaitUntil(() => GameManager.Instance.GetPlayer() != null); // 전투 시작 대기
-        //모든 추가능력치 다 합쳐진거 호출
-        player = GameManager.Instance.GetPlayer().GetStats();
-
-        LvlText.text = "LV." + player.Lv.ToString();
-        HpText.text = player.CurrentHp.ToString() + "/" + player.MaxHp.ToString();
-        AtkText.text = player.Attack.ToString();
-        DefText.text = player.Defense.ToString();
-        Debug.Log(AtkText.text);
-        Debug.Log(DefText.text);
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.StateChanged -= Refresh;
+        }
     }
 
-    //추후 1만 넘어가면 K 단위로 나눌거임
+    private void Refresh()
+    {
+        var runManager = RunManager.Instance;
+        var profile = GameManager.Instance != null ? GameManager.Instance.PlayerProfile : null;
 
+        if (runManager != null && runManager.RunState != null && runManager.RunState.stats != null)
+        {
+            var stats = runManager.RunState.stats;
+            SetText(LvlText, "LV." + Mathf.Max(1, profile != null && profile.stats != null ? profile.stats.level : 1));
+            SetText(HpText, stats.currentHp + "/" + stats.maxHp);
+            SetText(AtkText, stats.attack.ToString());
+            SetText(DefText, stats.defense.ToString());
+            return;
+        }
+
+        if (profile != null && profile.stats != null)
+        {
+            SetText(LvlText, "LV." + Mathf.Max(1, profile.stats.level));
+            SetText(HpText, profile.stats.maxHp + "/" + profile.stats.maxHp);
+            SetText(AtkText, Mathf.Max(1, profile.stats.attack).ToString());
+            SetText(DefText, Mathf.Max(0, profile.stats.defense).ToString());
+            return;
+        }
+
+        SetText(LvlText, "LV.-");
+        SetText(HpText, "-/ -");
+        SetText(AtkText, "-");
+        SetText(DefText, "-");
+    }
+
+    private static void SetText(TMP_Text text, string value)
+    {
+        if (text != null)
+        {
+            text.text = value;
+        }
+    }
 }
