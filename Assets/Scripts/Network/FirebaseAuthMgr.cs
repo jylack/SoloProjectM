@@ -29,6 +29,7 @@ public class FirebaseAuthMgr : MonoBehaviour
     public Text warningText;
     public Text confirmText;
 
+
     [Header("Profile Load")]
     [SerializeField] private int profileLoadRetryCount = 2;
     [SerializeField] private float profileRetryDelaySeconds = 0.25f;

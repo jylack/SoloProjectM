@@ -34,10 +34,16 @@ public class RewardSelectUI : MonoBehaviour
             rootPanel.SetActive(true);
         }
 
+        if (optionButtons == null || optionButtons.Length == 0)
+        {
+            Debug.LogWarning("[RewardSelectUI] optionButtons is empty.");
+            return;
+        }
+
         for (int i = 0; i < optionButtons.Length; i++)
         {
             var button = optionButtons[i];
-            var text = i < optionTexts.Length ? optionTexts[i] : null;
+            var text = (optionTexts != null && i < optionTexts.Length) ? optionTexts[i] : null;
             if (button == null)
             {
                 continue;
@@ -153,7 +159,13 @@ public class RewardSelectUI : MonoBehaviour
         var textObject = new GameObject(objectName);
         textObject.transform.SetParent(parent, false);
         var text = textObject.AddComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Font.CreateDynamicFontFromOSFont("Arial", 24);
+        if (text.font == null)
+        {
+            Debug.LogWarning("[RewardSelectUI] OS Arial font not found. Using Unity default font fallback.");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
         text.color = Color.white;
         text.fontSize = 24;
         text.text = value;
