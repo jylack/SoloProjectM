@@ -259,7 +259,18 @@ public class FirebaseAuthMgr : MonoBehaviour
             yield break;
         }
 
-        NormalizeProfile(profileData, currentUser);
+        bool profileUpdated = NormalizeProfile(profileData, currentUser);
+        if (profileUpdated)
+        {
+            var syncTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(JsonUtility.ToJson(profileData));
+            yield return new WaitUntil(() => syncTask.IsCompleted);
+            if (syncTask.Exception != null)
+            {
+                Debug.LogWarning("정규화된 프로필 동기화 실패 : " + syncTask.Exception);
+                onCompleted?.Invoke(false, "프로필 정규화 저장에 실패했습니다.");
+                yield break;
+            }
+        }
 
         string authEmail = currentUser.Email == null ? string.Empty : currentUser.Email.Trim();
         string loginEmail = inputEmail == null ? string.Empty : inputEmail.Trim();
@@ -337,32 +348,41 @@ public class FirebaseAuthMgr : MonoBehaviour
         }
     }
 
-    private void NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser)
+    private bool NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser)
     {
+        bool updated = false;
+
         if (string.IsNullOrEmpty(profileData.uid))
         {
             profileData.uid = currentUser.UserId;
+            updated = true;
         }
 
         if (string.IsNullOrEmpty(profileData.nickname))
         {
             profileData.nickname = GetSafeNickname(currentUser);
+            updated = true;
         }
 
         if (profileData.stats == null)
         {
             profileData.stats = PlayerStatsData.CreateDefault();
+            updated = true;
         }
 
         if (profileData.items == null)
         {
             profileData.items = new List<PlayerItemData>();
+            updated = true;
         }
 
         if (profileData.skills == null)
         {
             profileData.skills = new List<PlayerSkillData>();
+            updated = true;
         }
+
+        return updated;
     }
 
     private string GetSafeNickname(FirebaseUser currentUser)
