@@ -53,7 +53,7 @@ public class RunManager : MonoBehaviour
 
     public void StartNewRun(int stageId, int totalDays, int seed)
     {
-        RunState.StartRun(startStats);
+        RunState.StartRun(GetStartStatsFromProfile());
         CurrentStageRun = StageGenerator.Generate(stageId, totalDays, seed);
         _encounterLocked = false;
         NotifyStateChanged();
@@ -177,5 +177,25 @@ public class RunManager : MonoBehaviour
     private void NotifyStateChanged()
     {
         StateChanged?.Invoke();
+    }
+
+    private StatBlock GetStartStatsFromProfile()
+    {
+        var configured = startStats != null ? startStats.Clone() : new StatBlock();
+        var profile = GameManager.Instance != null ? GameManager.Instance.PlayerProfile : null;
+        var profileStats = profile != null ? profile.stats : null;
+
+        if (profileStats == null)
+        {
+            return configured;
+        }
+
+        configured.maxHp = Mathf.Max(1, profileStats.maxHp);
+        configured.currentHp = configured.maxHp;
+        configured.attack = Mathf.Max(1, profileStats.attack);
+        configured.defense = Mathf.Max(0, profileStats.defense);
+        configured.attackSpeed = Mathf.Max(1, profileStats.speed);
+
+        return configured;
     }
 }
