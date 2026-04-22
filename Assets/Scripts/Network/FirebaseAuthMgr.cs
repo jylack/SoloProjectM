@@ -29,6 +29,11 @@ public class FirebaseAuthMgr : MonoBehaviour
     public Text warningText;
     public Text confirmText;
 
+    [Header("Auth Emulator (Editor/Dev)")]
+    [SerializeField] private bool useAuthEmulator;
+    [SerializeField] private string authEmulatorHost = "127.0.0.1";
+    [SerializeField] private int authEmulatorPort = 9099;
+
     [Header("Profile Load")]
     [SerializeField] private int profileLoadRetryCount = 2;
     [SerializeField] private float profileRetryDelaySeconds = 0.25f;
@@ -38,6 +43,7 @@ public class FirebaseAuthMgr : MonoBehaviour
     private void Awake()
     {
         SetAuthButtonsInteractable(false);
+        EnsureAuthEmulatorEnvironmentFlag();
 
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
@@ -49,6 +55,7 @@ public class FirebaseAuthMgr : MonoBehaviour
                 app.Options.DatabaseUrl = new Uri("https://soloprojm-default-rtdb.firebaseio.com/");
 
                 auth = FirebaseAuth.DefaultInstance;
+                ConfigureAuthEmulator();
                 _databaseRoot = FirebaseDatabase.GetInstance(app).RootReference;
                 _isFirebaseReady = true;
                 SetAuthButtonsInteractable(true);
@@ -66,6 +73,28 @@ public class FirebaseAuthMgr : MonoBehaviour
         LoginBtn.onClick.AddListener(() => { Login(); });
         RegisterBtn.onClick.AddListener(() => { Register(); });
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
+    }
+
+    private void EnsureAuthEmulatorEnvironmentFlag()
+    {
+        const string envKey = "USE_AUTH_EMULATOR";
+        string value = Environment.GetEnvironmentVariable(envKey);
+
+        if (string.IsNullOrEmpty(value))
+        {
+            Environment.SetEnvironmentVariable(envKey, useAuthEmulator ? "1" : "0");
+        }
+    }
+
+    private void ConfigureAuthEmulator()
+    {
+        if (auth == null || !useAuthEmulator)
+        {
+            return;
+        }
+
+        auth.UseEmulator(authEmulatorHost, authEmulatorPort);
+        Debug.Log($"[FirebaseAuthMgr] Auth emulator enabled: {authEmulatorHost}:{authEmulatorPort}");
     }
 
     private void Start()
