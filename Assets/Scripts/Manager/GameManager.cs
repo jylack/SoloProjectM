@@ -35,6 +35,11 @@ public class GameManager : MonoBehaviour
 
     public void SetPlayerProfile(PlayerProfileData profile)
     {
+        if (profile == null)
+        {
+            return;
+        }
+
         PlayerProfile = profile;
     }
 

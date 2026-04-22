@@ -204,8 +204,34 @@ public class FirebaseAuthMgr : MonoBehaviour
 
         if (!snapshot.Exists)
         {
-            onCompleted?.Invoke(false, "DB에 등록된 유저 데이터가 없습니다.");
-            yield break;
+            bool created = false;
+            string createMessage = string.Empty;
+            yield return StartCoroutine(CreateDefaultProfileIfMissingCor(currentUser, (ok, message) =>
+            {
+                created = ok;
+                createMessage = message;
+            }));
+
+            if (!created)
+            {
+                onCompleted?.Invoke(false, createMessage);
+                yield break;
+            }
+
+            var reloadTask = _databaseRoot.Child("users").Child(currentUser.UserId).GetValueAsync();
+            yield return new WaitUntil(() => reloadTask.IsCompleted);
+            if (reloadTask.Exception != null)
+            {
+                onCompleted?.Invoke(false, "생성된 프로필을 다시 불러오지 못했습니다.");
+                yield break;
+            }
+
+            snapshot = reloadTask.Result;
+            if (snapshot == null || !snapshot.Exists)
+            {
+                onCompleted?.Invoke(false, "프로필 생성 후 검증에 실패했습니다.");
+                yield break;
+            }
         }
 
         string rawJson = snapshot.GetRawJsonValue();
@@ -233,7 +259,18 @@ public class FirebaseAuthMgr : MonoBehaviour
             yield break;
         }
 
-        NormalizeProfile(profileData, currentUser);
+        bool profileUpdated = NormalizeProfile(profileData, currentUser);
+        if (profileUpdated)
+        {
+            var syncTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(JsonUtility.ToJson(profileData));
+            yield return new WaitUntil(() => syncTask.IsCompleted);
+            if (syncTask.Exception != null)
+            {
+                Debug.LogWarning("정규화된 프로필 동기화 실패 : " + syncTask.Exception);
+                onCompleted?.Invoke(false, "프로필 정규화 저장에 실패했습니다.");
+                yield break;
+            }
+        }
 
         string authEmail = currentUser.Email == null ? string.Empty : currentUser.Email.Trim();
         string loginEmail = inputEmail == null ? string.Empty : inputEmail.Trim();
@@ -255,6 +292,31 @@ public class FirebaseAuthMgr : MonoBehaviour
             GameManager.Instance.SetPlayerProfile(profileData);
         }
 
+        onCompleted?.Invoke(true, string.Empty);
+    }
+
+    private IEnumerator CreateDefaultProfileIfMissingCor(FirebaseUser currentUser, Action<bool, string> onCompleted)
+    {
+        if (_databaseRoot == null || currentUser == null)
+        {
+            onCompleted?.Invoke(false, "기본 프로필 생성 준비가 완료되지 않았습니다.");
+            yield break;
+        }
+
+        string nickname = GetSafeNickname(currentUser);
+        var defaultProfile = PlayerProfileData.CreateDefault(currentUser.UserId, nickname);
+
+        var createTask = _databaseRoot.Child("users").Child(currentUser.UserId).SetRawJsonValueAsync(JsonUtility.ToJson(defaultProfile));
+        yield return new WaitUntil(() => createTask.IsCompleted);
+
+        if (createTask.Exception != null)
+        {
+            Debug.LogWarning("기본 프로필 자동 생성 실패 : " + createTask.Exception);
+            onCompleted?.Invoke(false, "DB에 유저 데이터가 없어 자동 생성을 시도했지만 실패했습니다.");
+            yield break;
+        }
+
+        Debug.Log("[FirebaseAuthMgr] DB 유저 데이터가 없어 기본 프로필을 자동 생성했습니다.");
         onCompleted?.Invoke(true, string.Empty);
     }
 
@@ -286,32 +348,41 @@ public class FirebaseAuthMgr : MonoBehaviour
         }
     }
 
-    private void NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser)
+    private bool NormalizeProfile(PlayerProfileData profileData, FirebaseUser currentUser)
     {
+        bool updated = false;
+
         if (string.IsNullOrEmpty(profileData.uid))
         {
             profileData.uid = currentUser.UserId;
+            updated = true;
         }
 
         if (string.IsNullOrEmpty(profileData.nickname))
         {
             profileData.nickname = GetSafeNickname(currentUser);
+            updated = true;
         }
 
         if (profileData.stats == null)
         {
             profileData.stats = PlayerStatsData.CreateDefault();
+            updated = true;
         }
 
         if (profileData.items == null)
         {
             profileData.items = new List<PlayerItemData>();
+            updated = true;
         }
 
         if (profileData.skills == null)
         {
             profileData.skills = new List<PlayerSkillData>();
+            updated = true;
         }
+
+        return updated;
     }
 
     private string GetSafeNickname(FirebaseUser currentUser)

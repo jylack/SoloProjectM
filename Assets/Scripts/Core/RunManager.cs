@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RunManager : MonoBehaviour
@@ -53,7 +54,8 @@ public class RunManager : MonoBehaviour
 
     public void StartNewRun(int stageId, int totalDays, int seed)
     {
-        RunState.StartRun(startStats);
+        RunState.StartRun(GetStartStatsFromProfile());
+        ApplyProfileProgressToRunState();
         CurrentStageRun = StageGenerator.Generate(stageId, totalDays, seed);
         _encounterLocked = false;
         NotifyStateChanged();
@@ -177,5 +179,75 @@ public class RunManager : MonoBehaviour
     private void NotifyStateChanged()
     {
         StateChanged?.Invoke();
+    }
+
+    private StatBlock GetStartStatsFromProfile()
+    {
+        var configured = startStats != null ? startStats.Clone() : new StatBlock();
+        var profile = GameManager.Instance != null ? GameManager.Instance.PlayerProfile : null;
+        var profileStats = profile != null ? profile.stats : null;
+
+        if (profileStats == null)
+        {
+            return configured;
+        }
+
+        configured.maxHp = Mathf.Max(1, profileStats.maxHp);
+        configured.currentHp = configured.maxHp;
+        configured.attack = Mathf.Max(1, profileStats.attack);
+        configured.defense = Mathf.Max(0, profileStats.defense);
+        configured.attackSpeed = Mathf.Max(1, profileStats.speed);
+
+        return configured;
+    }
+
+    private void ApplyProfileProgressToRunState()
+    {
+        if (RunState == null)
+        {
+            return;
+        }
+
+        var profile = GameManager.Instance != null ? GameManager.Instance.PlayerProfile : null;
+        if (profile == null)
+        {
+            return;
+        }
+
+        RunState.currentGold = Mathf.Max(0, profile.gold);
+        RunState.ownedItemIds = new List<string>();
+        RunState.ownedSkillIds = new List<string>();
+
+        if (profile.items != null)
+        {
+            foreach (var item in profile.items)
+            {
+                if (item == null || string.IsNullOrEmpty(item.itemId))
+                {
+                    continue;
+                }
+
+                if (!RunState.ownedItemIds.Contains(item.itemId))
+                {
+                    RunState.ownedItemIds.Add(item.itemId);
+                }
+            }
+        }
+
+        if (profile.skills != null)
+        {
+            foreach (var skill in profile.skills)
+            {
+                if (skill == null || string.IsNullOrEmpty(skill.skillId))
+                {
+                    continue;
+                }
+
+                if (!RunState.ownedSkillIds.Contains(skill.skillId))
+                {
+                    RunState.ownedSkillIds.Add(skill.skillId);
+                }
+            }
+        }
     }
 }
