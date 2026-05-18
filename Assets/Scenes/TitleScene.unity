@@ -228,6 +228,11 @@ MonoBehaviour:
   RegisterUI: {fileID: 1195302235}
   warningText: {fileID: 1228278044}
   confirmText: {fileID: 1289588716}
+  useAuthEmulator: 0
+  authEmulatorHost: 127.0.0.1
+  authEmulatorPort: 9099
+  profileLoadRetryCount: 2
+  profileRetryDelaySeconds: 0.25
 --- !u!1 &230115468
 GameObject:
   m_ObjectHideFlags: 0
@@ -345,7 +350,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 230115470}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 92878330}
+        m_TargetAssemblyTypeName: FirebaseAuthMgr, Assembly-CSharp
+        m_MethodName: Register
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &254961893
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,7 +954,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerState: {fileID: 0}
-  CurrentDay: 1
 --- !u!4 &860729532
 Transform:
   m_ObjectHideFlags: 0
@@ -2590,7 +2606,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 92878330}
         m_TargetAssemblyTypeName: FirebaseAuthMgr, Assembly-CSharp
-        m_MethodName: TestLogin
+        m_MethodName: Login
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

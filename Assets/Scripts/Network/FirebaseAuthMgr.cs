@@ -43,7 +43,6 @@ public class FirebaseAuthMgr : MonoBehaviour
     private void Awake()
     {
         SetAuthButtonsInteractable(false);
-        EnsureAuthEmulatorEnvironmentFlag();
 
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
@@ -55,7 +54,7 @@ public class FirebaseAuthMgr : MonoBehaviour
                 app.Options.DatabaseUrl = new Uri("https://soloprojm-default-rtdb.firebaseio.com/");
 
                 auth = FirebaseAuth.DefaultInstance;
-                ConfigureAuthEmulator();
+                
                 _databaseRoot = FirebaseDatabase.GetInstance(app).RootReference;
                 _isFirebaseReady = true;
                 SetAuthButtonsInteractable(true);
@@ -75,28 +74,7 @@ public class FirebaseAuthMgr : MonoBehaviour
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
     }
 
-    private void EnsureAuthEmulatorEnvironmentFlag()
-    {
-        const string envKey = "USE_AUTH_EMULATOR";
-        string value = Environment.GetEnvironmentVariable(envKey);
-
-        if (string.IsNullOrEmpty(value))
-        {
-            Environment.SetEnvironmentVariable(envKey, useAuthEmulator ? "1" : "0");
-        }
-    }
-
-    private void ConfigureAuthEmulator()
-    {
-        if (auth == null || !useAuthEmulator)
-        {
-            return;
-        }
-
-        auth.UseEmulator(authEmulatorHost, authEmulatorPort);
-        Debug.Log($"[FirebaseAuthMgr] Auth emulator enabled: {authEmulatorHost}:{authEmulatorPort}");
-    }
-
+    
     private void Start()
     {
         RegisterUI.SetActive(false);
