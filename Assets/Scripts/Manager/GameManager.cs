@@ -49,4 +49,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(sceneName.ToString());
     }
+
+    public void ClearPlayerProfile()
+    {
+        PlayerProfile = null;
+        Debug.Log("[GameManager] PlayerProfile이 초기화되었습니다.");
+    }
 }

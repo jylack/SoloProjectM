@@ -54,13 +54,14 @@ public class FirebaseAuthMgr : MonoBehaviour
                 app.Options.DatabaseUrl = new Uri("https://soloprojm-default-rtdb.firebaseio.com/");
 
                 auth = FirebaseAuth.DefaultInstance;
-                
+
                 _databaseRoot = FirebaseDatabase.GetInstance(app).RootReference;
                 _isFirebaseReady = true;
                 SetAuthButtonsInteractable(true);
 
                 Debug.Log("[FirebaseAuthMgr] Firebase init + DB URL set");
-                TryLoadCurrentUserProfile();
+                //TryLoadCurrentUserProfile();
+
             }
             else
             {
@@ -74,7 +75,7 @@ public class FirebaseAuthMgr : MonoBehaviour
         CreateIDBtn.onClick.AddListener(() => { CreateID(); });
     }
 
-    
+
     private void Start()
     {
         RegisterUI.SetActive(false);
@@ -91,6 +92,48 @@ public class FirebaseAuthMgr : MonoBehaviour
         }
 
         StartCoroutine(LoginCor(emailField.text, pwField.text));
+    }
+    public void Logout()
+    {
+        if (auth == null)
+        {
+            if (warningText != null)
+            {
+                warningText.text = "로그아웃 준비가 완료되지 않았습니다.";
+            }
+
+            return;
+        }
+
+        auth.SignOut();
+        user = null;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ClearPlayerProfile();
+        }
+
+        if (emailField != null)
+        {
+            emailField.text = "";
+        }
+
+        if (pwField != null)
+        {
+            pwField.text = "";
+        }
+
+        if (warningText != null)
+        {
+            warningText.text = "로그아웃 되었습니다.";
+        }
+
+        if (confirmText != null)
+        {
+            confirmText.text = "";
+        }
+
+        Debug.Log("[FirebaseAuthMgr] 로그아웃 완료.");
     }
 
     public void Register()
@@ -161,6 +204,7 @@ public class FirebaseAuthMgr : MonoBehaviour
 
         GameManager.Instance.SceneLoad(SceneName.RoomScene);
     }
+
 
     private void TryLoadCurrentUserProfile()
     {
