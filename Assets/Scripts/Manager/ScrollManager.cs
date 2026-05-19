@@ -103,6 +103,7 @@ public class ScrollManager : MonoBehaviour
     {
         if (!isDragging)
         {
+            Debug.Log($"[ScrollManager] Smoothly moving scrollbar from {scrollbar.value} to {targetPos}");  
             scrollbar.value = Mathf.Lerp(scrollbar.value, targetPos, 0.1f);
         }
 

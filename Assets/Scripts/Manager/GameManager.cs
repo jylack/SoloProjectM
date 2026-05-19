@@ -37,13 +37,13 @@ public class GameManager : MonoBehaviour
     {
         if (profile == null)
         {
-            Debug.LogError("[GameManager] SetPlayerProfile ½ÇÆĞ: profileÀÌ nullÀÔ´Ï´Ù.");
+            Debug.LogError("[GameManager] SetPlayerProfile ì‹¤íŒ¨: profileì´ nullì…ë‹ˆë‹¤.");
             return;
         }
 
         PlayerProfile = profile;
 
-        Debug.Log($"[GameManager] PlayerProfile ÀúÀå ¿Ï·á / uid={profile.uid}, nickname={profile.nickname}");
+        Debug.Log($"[GameManager] PlayerProfile ì €ì¥ ì™„ë£Œ / uid={profile.uid}, nickname={profile.nickname}");
     }
     public void SceneLoad(SceneName sceneName)
     {
@@ -53,6 +53,6 @@ public class GameManager : MonoBehaviour
     public void ClearPlayerProfile()
     {
         PlayerProfile = null;
-        Debug.Log("[GameManager] PlayerProfileÀÌ ÃÊ±âÈ­µÇ¾ú½À´Ï´Ù.");
+        Debug.Log("[GameManager] PlayerProfileì´ ì´ˆê¸°í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
     }
 }

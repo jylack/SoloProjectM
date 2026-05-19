@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class AutoSplitUI : MonoBehaviour
 {
-    [SerializeField] RectTransform panelA;  // Portrait »ó´Ü, Landscape ÁÂÃø
-    [SerializeField] RectTransform panelB;  // Portrait ÇÏ´Ü, Landscape ¿ìÃø
+    [SerializeField] RectTransform panelA;  // Portrait ìƒë‹¨, Landscape ì¢Œì¸¡
+    [SerializeField] RectTransform panelB;  // Portrait í•˜ë‹¨, Landscape ìš°ì¸¡
 
     bool lastIsLandscape = false;
 
@@ -25,15 +25,15 @@ public class AutoSplitUI : MonoBehaviour
 
         if (isLandscape)
         {
-            // °¡·Î ¸ğµå ¡æ ÁÂ/¿ì Àı¹İ
-            SetAnchors(panelA, new Vector2(0f, 0f), new Vector2(0.5f, 1f));  // ÁÂÃø
-            SetAnchors(panelB, new Vector2(0.5f, 0f), new Vector2(1f, 1f));  // ¿ìÃø
+            // ê°€ë¡œ ëª¨ë“œ â†’ ì¢Œ/ìš° ì ˆë°˜
+            SetAnchors(panelA, new Vector2(0f, 0f), new Vector2(0.5f, 1f));  // ì¢Œì¸¡
+            SetAnchors(panelB, new Vector2(0.5f, 0f), new Vector2(1f, 1f));  // ìš°ì¸¡
         }
         else
         {
-            // ¼¼·Î ¸ğµå ¡æ »ó/ÇÏ Àı¹İ
-            SetAnchors(panelA, new Vector2(0f, 0.5f), new Vector2(1f, 1f));  // »ó´Ü
-            SetAnchors(panelB, new Vector2(0f, 0f), new Vector2(1f, 0.5f)); // ÇÏ´Ü
+            // ì„¸ë¡œ ëª¨ë“œ â†’ ìƒ/í•˜ ì ˆë°˜
+            SetAnchors(panelA, new Vector2(0f, 0.5f), new Vector2(1f, 1f));  // ìƒë‹¨
+            SetAnchors(panelB, new Vector2(0f, 0f), new Vector2(1f, 0.5f)); // í•˜ë‹¨
         }
 
         lastIsLandscape = isLandscape;

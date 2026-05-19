@@ -15,7 +15,8 @@ public class RoomProfileUI : MonoBehaviour
     [SerializeField] private TMP_Text defenseText;
 
     [Header("Character Preview")]
-    [SerializeField] private CharacterPrefabPreview characterPrefabPreview;
+    [SerializeField] private CharacterPrefabPreview equipCharacterPreview;
+    [SerializeField] private CharacterPrefabPreview adventureCharacterPreview;
 
     private void Start()
     {
@@ -41,10 +42,16 @@ public class RoomProfileUI : MonoBehaviour
         RefreshAccount(profile);
         RefreshCharacterStats(profile.stats);
 
-        if (characterPrefabPreview != null)
+        if(equipCharacterPreview != null)
         {
-            characterPrefabPreview.Apply(profile.appearance);
+             equipCharacterPreview.Apply(profile.appearance);
+             equipCharacterPreview.PlayIdle();
         }
+        if(adventureCharacterPreview != null)
+        {
+            adventureCharacterPreview.Apply(profile.appearance);
+            adventureCharacterPreview.PlayMove();
+        }   
     }
 
     private void RefreshAccount(PlayerProfileData profile)

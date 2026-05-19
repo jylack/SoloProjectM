@@ -8,8 +8,8 @@ public class RewardManager : MonoBehaviour
 {
     public static RewardManager instance;
 
-    Dictionary<int ,Reward> rewards = new(); // º¸»ó ¸®½ºÆ®
-                                             // º¸»ó ID¸¦ Å°·Î »ç¿ëÇÏ¿© º¸»óÀ» ÀúÀåÇÏ´Â Dictionary¸¦ »ç¿ëÇÕ´Ï´Ù.
+    Dictionary<int ,Reward> rewards = new(); // ë³´ìƒ ë¦¬ìŠ¤íŠ¸
+                                             // ë³´ìƒ IDë¥¼ í‚¤ë¡œ ì‚¬ìš©í•˜ì—¬ ë³´ìƒì„ ì €ì¥í•˜ëŠ” Dictionaryë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
 
     private void Awake()
     {

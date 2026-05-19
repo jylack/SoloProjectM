@@ -8,20 +8,20 @@ public class LogEntry : MonoBehaviour
     [SerializeField] TMP_Text messageText;
     [SerializeField] LayoutElement layoutElement;
 
-    private const float padding = 16f;  // À§¾Æ·¡ ¿©À¯ °ø°£
+    private const float padding = 16f;  // ìœ„ì•„ë˜ ì—¬ìœ  ê³µê°„
 
     /// <summary>
-    /// ³¯Â¥ ·Î±× ÃÊ±âÈ­
+    /// ë‚ ì§œ ë¡œê·¸ ì´ˆê¸°í™”
     /// </summary>
     public void InitializeDay(int day, string msg)
     {
         dayText.gameObject.SetActive(true);
-        dayText.text = $"{day}ÀÏÂ÷";
+        dayText.text = $"{day}ì¼ì°¨";
         SetupMessage(msg);
     }
 
     /// <summary>
-    /// ÀÏ¹İ ·Î±× ÃÊ±âÈ­
+    /// ì¼ë°˜ ë¡œê·¸ ì´ˆê¸°í™”
     /// </summary>
     public void InitializeLog(string msg)
     {
@@ -32,13 +32,13 @@ public class LogEntry : MonoBehaviour
     
     private void SetupMessage(string message)
     {
-        // 1) ÅØ½ºÆ® ¼¼ÆÃ
+        // 1) í…ìŠ¤íŠ¸ ì„¸íŒ…
         messageText.text = message;
 
-        // 2) ·¹ÀÌ¾Æ¿ô °ªÀÌ °»½ÅµÇµµ·Ï °­Á¦
+        // 2) ë ˆì´ì•„ì›ƒ ê°’ì´ ê°±ì‹ ë˜ë„ë¡ ê°•ì œ
         Canvas.ForceUpdateCanvases();
 
-        // 3) ÅØ½ºÆ®ÀÇ preferredHeight ¿¡ ÆĞµùÀ» ´õÇØ¼­ ¸»Ç³¼± ³ôÀÌ ÁöÁ¤
+        // 3) í…ìŠ¤íŠ¸ì˜ preferredHeight ì— íŒ¨ë”©ì„ ë”í•´ì„œ ë§í’ì„  ë†’ì´ ì§€ì •
         //layoutElement.minHeight = messageText.preferredHeight + padding;
     }
 

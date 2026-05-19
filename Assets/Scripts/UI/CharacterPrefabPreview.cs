@@ -3,11 +3,17 @@ using UnityEngine;
 public class CharacterPrefabPreview : MonoBehaviour
 {
     [SerializeField] private Transform characterParent;
-    [SerializeField] private string defaultPrefabPath = "SPUM/Resources/Units/SPUM_202504171";
+    [SerializeField] private string defaultPrefabPath = "SPUM_20250417115258389";
+    [SerializeField] private PlayerState initialState = PlayerState.IDLE;
+    [SerializeField] private int initialAnimationIndex = 0;
     [SerializeField] private bool initializeSpumAnimation = true;
-
+    [SerializeField] private string previewLayerName = "PreviewCharacter";
+    
+    private SPUM_Prefabs spumPrefab;
     private GameObject currentCharacter;
 
+
+    
     public void Apply(PlayerAppearanceData appearance)
     {
         string prefabPath = GetPrefabPath(appearance);
@@ -22,7 +28,28 @@ public class CharacterPrefabPreview : MonoBehaviour
             currentCharacter = null;
         }
     }
+    public void PlayIdle()
+    {
+        Play(PlayerState.IDLE, 0);
+    }
 
+    public void PlayMove()
+    {
+        Play(PlayerState.MOVE, 0);
+    }
+
+    public void Play(PlayerState state, int index)
+    {
+        if (spumPrefab == null)
+        {
+            Debug.LogWarning("[CharacterPrefabPreview] SPUM prefab is not ready.");
+            return;
+        }
+
+        spumPrefab.PlayAnimation(state, index);
+    }
+   
+    
     private string GetPrefabPath(PlayerAppearanceData appearance)
     {
         if (appearance == null || string.IsNullOrEmpty(appearance.characterPrefabId))
@@ -33,6 +60,7 @@ public class CharacterPrefabPreview : MonoBehaviour
         return appearance.characterPrefabId;
     }
 
+    
     private void LoadPrefab(string resourcesPath)
     {
         if (string.IsNullOrEmpty(resourcesPath))
@@ -41,6 +69,7 @@ public class CharacterPrefabPreview : MonoBehaviour
             return;
         }
 
+    
         Transform parent = characterParent != null ? characterParent : transform;
 
         Clear();
@@ -57,6 +86,8 @@ public class CharacterPrefabPreview : MonoBehaviour
         currentCharacter.transform.localRotation = Quaternion.identity;
         currentCharacter.transform.localScale = Vector3.one;
 
+        SetLayerRecursively(currentCharacter, LayerMask.NameToLayer(previewLayerName));
+
         if (initializeSpumAnimation)
         {
             InitSpum(currentCharacter);
@@ -64,8 +95,8 @@ public class CharacterPrefabPreview : MonoBehaviour
     }
 
     private void InitSpum(GameObject characterObject)
-    {
-        SPUM_Prefabs spumPrefab = characterObject.GetComponentInChildren<SPUM_Prefabs>(true);
+    {        
+        spumPrefab = characterObject.GetComponentInChildren<SPUM_Prefabs>(true);
         if (spumPrefab == null)
         {
             return;
@@ -82,8 +113,49 @@ public class CharacterPrefabPreview : MonoBehaviour
             return;
         }
 
+        
         spumPrefab.PopulateAnimationLists();
         spumPrefab.OverrideControllerInit();
         spumPrefab.PlayAnimation(PlayerState.IDLE, 0);
     }
+
+    public void RefreshFromGameManager()
+    {
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("[CharacterPrefabPreview] GameManager.Instance is null.");
+            return;
+        }
+
+        PlayerProfileData profile = GameManager.Instance.PlayerProfile;
+
+        if (profile == null)
+        {
+            Debug.LogError("[CharacterPrefabPreview] PlayerProfile is null.");
+            return;
+        }
+
+        Apply(profile.appearance);
+    }
+
+    private void SetLayerRecursively(GameObject target, int layer)
+{
+    if (target == null)
+    {
+        return;
+    }
+
+    if (layer < 0)
+    {
+        Debug.LogWarning("[CharacterPrefabPreview] Preview layer not found.");
+        return;
+    }
+
+    target.layer = layer;
+
+    foreach (Transform child in target.transform)
+    {
+        SetLayerRecursively(child.gameObject, layer);
+    }
+}
 }

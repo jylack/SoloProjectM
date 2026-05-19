@@ -44,9 +44,9 @@ public class UnitStats : ICombatant
     public void LevelUp()
     {
         _lv++;
-        _maxHp += 10; // ΏΉ½Γ: ·ΉΊ§Ύχ ½Γ ΓΦ΄λ HP Αυ°΅
-        _attack += 2; // ΏΉ½Γ: ·ΉΊ§Ύχ ½Γ °ψ°έ·Β Αυ°΅
-        _speed += 1; // ΏΉ½Γ: ·ΉΊ§Ύχ ½Γ ΌΣµµ Αυ°΅
+        _maxHp += 10; // μμ‹: λ λ²¨μ—… μ‹ μµλ€ HP μ¦κ°€
+        _attack += 2; // μμ‹: λ λ²¨μ—… μ‹ κ³µκ²©λ ¥ μ¦κ°€
+        _speed += 1; // μμ‹: λ λ²¨μ—… μ‹ μ†λ„ μ¦κ°€
         OnHpChanged?.Invoke(_currentHp, _maxHp);
     }
 

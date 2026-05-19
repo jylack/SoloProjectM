@@ -19,8 +19,8 @@ public class BackGroundScroll : MonoBehaviour
         uv.x += scrollSpeed.x * Time.deltaTime;
         uv.y += scrollSpeed.y * Time.deltaTime;
 
-        uv.x = uv.x % 1; // UV ÁÂÇ¥¸¦ 0-1 ¹üÀ§·Î Á¦ÇÑ
-        uv.y = uv.y % 1; // UV ÁÂÇ¥¸¦ 0-1 ¹üÀ§·Î Á¦ÇÑ
+        uv.x = uv.x % 1; // UV ì¢Œí‘œë¥¼ 0-1 ë²”ìœ„ë¡œ ì œí•œ
+        uv.y = uv.y % 1; // UV ì¢Œí‘œë¥¼ 0-1 ë²”ìœ„ë¡œ ì œí•œ
         
         backgroundImage[0].uvRect = uv;
         Debug.Log("Background Scrolling: " + uv.x + ", " + uv.y);

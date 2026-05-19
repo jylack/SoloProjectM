@@ -1,22 +1,14 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
 public class StageSelectionCtrl : MonoBehaviour
 {
-    //private RectTransform contentRoot;     // ScrollView > Content
-    [SerializeField] private RectTransform contentRoot;     // ScrollView > Content
-    [SerializeField] private StageButton stageButtonPrefab;  // StageButton 프리팹
-    [SerializeField] private List<StageDefinition> stages;  // 1스테이지, 2스테이지 SO 리스트
-
-    //private void Awake()
-    //{
-    //    contentRoot = GetComponent<RectTransform>();
-    //}
+    [SerializeField] private RectTransform stageButtonRoot;
+    [SerializeField] private StageButton stageButtonPrefab;
+    [SerializeField] private List<StageDefinition> stages;
 
     private void Start()
     {
-
         if (StageManager.Instance != null)
         {
             StageManager.Instance.ConfigureStages(stages, true);
@@ -31,17 +23,10 @@ public class StageSelectionCtrl : MonoBehaviour
 
     private void PopulateStageList()
     {
-        if (contentRoot == null)
+        if (stageButtonRoot == null)
         {
-            contentRoot = GetComponent<RectTransform>();
-            Debug.Log("NOOOooo");
-
-            if (contentRoot == null)
-            {
-                Debug.LogError("StageSelectionCtrl: Content root is not assigned.");
-                return;
-            }
-
+            Debug.LogError("StageSelectionCtrl: Stage button root is not assigned.");
+            return;
         }
 
         if (stageButtonPrefab == null)
@@ -50,18 +35,25 @@ public class StageSelectionCtrl : MonoBehaviour
             return;
         }
 
-        for (int i = contentRoot.childCount - 1; i >= 0; i--)
-        {
-            Destroy(contentRoot.GetChild(i).gameObject);
-        }
+        ClearStageButtons();
 
-        foreach (var def in stages)
+        foreach (StageDefinition def in stages)
         {
             if (def == null)
+            {
                 continue;
+            }
 
-            var button = Instantiate(stageButtonPrefab, contentRoot);
+            StageButton button = Instantiate(stageButtonPrefab, stageButtonRoot);
             button.Initialize(def);
+        }
+    }
+
+    private void ClearStageButtons()
+    {
+        for (int i = stageButtonRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(stageButtonRoot.GetChild(i).gameObject);
         }
     }
 }

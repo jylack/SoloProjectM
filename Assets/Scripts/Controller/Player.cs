@@ -31,53 +31,53 @@ public class Player : MonoBehaviour
 
     public void AnimSetting()
     {
-        //// 1) ¿¡¼Â ¾ÈÀÇ AnimationData ¸®½ºÆ®¸¦ stateº° ¸®½ºÆ®·Î Ã¤¿ì°í
+        //// 1) ì—ì…‹ ì•ˆì˜ AnimationData ë¦¬ìŠ¤íŠ¸ë¥¼ stateë³„ ë¦¬ìŠ¤íŠ¸ë¡œ ì±„ìš°ê³ 
         animCtrl.PopulateAnimationLists();
 
-        //// 2) AnimatorOverrideController¸¦ »ı¼ºÇØ¼­ 
-        ////    ±âÁ¸ ·±Å¸ÀÓ ÄÁÆ®·Ñ·¯ÀÇ °¢ Å¬¸³À» º¹Á¦(override)ÇØ µÓ´Ï´Ù
+        //// 2) AnimatorOverrideControllerë¥¼ ìƒì„±í•´ì„œ 
+        ////    ê¸°ì¡´ ëŸ°íƒ€ì„ ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ê° í´ë¦½ì„ ë³µì œ(override)í•´ ë‘¡ë‹ˆë‹¤
         animCtrl.OverrideControllerInit();
     }
 
-    //Àåºñ µîµî ¹Ş¾Æ¼­ ½ºÅİ ¾÷µ¥ÀÌÆ® ÇØÁÜ.
-    //¾î¶² °ø°İÇÒ¶§ È®·üÀûÀ¸·Î Å©¸®Æ¼ÄÃ°°Àº°Å ¶ß¸é °è»êÇØ¼­ µ¥¹ÌÁö ³Ñ°ÜÁÜ.
-    //½ºÅİÀ» ³Ñ°ÜÁÖ°í ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ³Ñ°ÜÁÜ.
-    //»ç¿ë°¡´ÉÇÑ ½ºÅ³ ¸®½ºÆ® »ç¿ë
+    //ì¥ë¹„ ë“±ë“± ë°›ì•„ì„œ ìŠ¤í…Ÿ ì—…ë°ì´íŠ¸ í•´ì¤Œ.
+    //ì–´ë–¤ ê³µê²©í• ë•Œ í™•ë¥ ì ìœ¼ë¡œ í¬ë¦¬í‹°ì»¬ê°™ì€ê±° ëœ¨ë©´ ê³„ì‚°í•´ì„œ ë°ë¯¸ì§€ ë„˜ê²¨ì¤Œ.
+    //ìŠ¤í…Ÿì„ ë„˜ê²¨ì£¼ê³  ì• ë‹ˆë©”ì´ì…˜ì„ ë„˜ê²¨ì¤Œ.
+    //ì‚¬ìš©ê°€ëŠ¥í•œ ìŠ¤í‚¬ ë¦¬ìŠ¤íŠ¸ ì‚¬ìš©
 
-    //±âº» ¾Ö´Ï¸ŞÀÌ¼Ç ¼¼ÆÃ
+    //ê¸°ë³¸ ì• ë‹ˆë©”ì´ì…˜ ì„¸íŒ…
     public void SetAnim(PlayerState playerState)
     {
         animCtrl.PlayAnimation(playerState, 0);
     }
 
-    //°ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç ¼¼ÆÃ
+    //ê³µê²© ì• ë‹ˆë©”ì´ì…˜ ì„¸íŒ…
     public void SetAtkAnim(PlayerState playerState, AttackType attackType)
     {
         animCtrl.PlayAnimation(playerState, (int)attackType);
     }
 
-    //¹ø¿Ü ¾Ö´Ï¸ŞÀÌ¼Ç ¼¼ÆÃ
+    //ë²ˆì™¸ ì• ë‹ˆë©”ì´ì…˜ ì„¸íŒ…
     public void SetOtherAnim(PlayerState playerState, OtherType otherType)
     {
         animCtrl.PlayAnimation(playerState, (int)otherType);
     }
 
-    //Ãß°¡ ½ºÅÈ Àû¿ë
+    //ì¶”ê°€ ìŠ¤íƒ¯ ì ìš©
     public void StateApply(UnitStats stats)
     {
         ApplyState = stats;
     }
-    //¿øº»½ºÅİ ¹İÈ¯
+    //ì›ë³¸ìŠ¤í…Ÿ ë°˜í™˜
     public UnitStats GetOriginStats()
     {
         return unitStats;
     }
-    //Àû¿ëµÈ ½ºÅİ ¹İÈ¯
+    //ì ìš©ëœ ìŠ¤í…Ÿ ë°˜í™˜
     public UnitStats GetApplyState()
     {
         return ApplyState;
     }
-    //Àû¿ëµÈ ½ºÅİ°ú ¿øº»½ºÅİÀ» ÇÕÃÄ¼­ ¹İÈ¯
+    //ì ìš©ëœ ìŠ¤í…Ÿê³¼ ì›ë³¸ìŠ¤í…Ÿì„ í•©ì³ì„œ ë°˜í™˜
     public UnitStats GetStats()
     {
         UnitStats value = new UnitStats(unitStats.Name, unitStats.MaxHp + ApplyState.MaxHp, unitStats.Attack + ApplyState.Attack, unitStats.Speed + ApplyState.Speed, unitStats.MaxActionsPerTurn + ApplyState.MaxActionsPerTurn);
@@ -87,9 +87,9 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀüÅõ ½Ã½ºÅÛ¿¡¼­ »ç¿ëÇÒ ½ºÅÈ ÀÎÅÍÆäÀÌ½º¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// ì „íˆ¬ ì‹œìŠ¤í…œì—ì„œ ì‚¬ìš©í•  ìŠ¤íƒ¯ ì¸í„°í˜ì´ìŠ¤ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <returns>ICombatant Å¸ÀÔÀ¸·Î UnitStats ¹İÈ¯</returns>
+    /// <returns>ICombatant íƒ€ì…ìœ¼ë¡œ UnitStats ë°˜í™˜</returns>
     public ICombatant GetCombatStats()
     {
         return GetStats();
