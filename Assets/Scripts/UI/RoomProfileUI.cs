@@ -14,6 +14,9 @@ public class RoomProfileUI : MonoBehaviour
     [SerializeField] private TMP_Text attackText;
     [SerializeField] private TMP_Text defenseText;
 
+    [Header("Character Preview")]
+    [SerializeField] private CharacterPrefabPreview characterPrefabPreview;
+
     private void Start()
     {
         Refresh();
@@ -37,29 +40,19 @@ public class RoomProfileUI : MonoBehaviour
 
         RefreshAccount(profile);
         RefreshCharacterStats(profile.stats);
+
+        if (characterPrefabPreview != null)
+        {
+            characterPrefabPreview.Apply(profile.appearance);
+        }
     }
 
     private void RefreshAccount(PlayerProfileData profile)
     {
-        if (nicknameText != null)
-        {
-            nicknameText.text = profile.nickname;
-        }
-
-        if (goldText != null)
-        {
-            goldText.text = FormatStat(profile.gold);
-        }
-
-        if (diamondsText != null)
-        {
-            diamondsText.text = FormatStat(profile.diamonds);
-        }
-
-        if (energyText != null)
-        {
-            energyText.text = FormatStat(profile.energy);
-        }
+        if (nicknameText != null) nicknameText.text = profile.nickname;
+        if (goldText != null) goldText.text = FormatStat(profile.gold);
+        if (diamondsText != null) diamondsText.text = FormatStat(profile.diamonds);
+        if (energyText != null) energyText.text = FormatStat(profile.energy);
     }
 
     private void RefreshCharacterStats(PlayerStatsData stats)
@@ -70,22 +63,9 @@ public class RoomProfileUI : MonoBehaviour
             return;
         }
 
-        if (hpText != null)
-        {
-            hpText.text = FormatStat(stats.maxHp);
-        }
-
-        if (attackText != null)
-        {
-            attackText.text = FormatStat(stats.attack);
-        }
-
-        if (defenseText != null)
-        {
-            defenseText.text = FormatStat(stats.defense);
-        }
-
-        Debug.Log($"[RoomProfileUI] Profile UI refreshed. HP={stats.maxHp}, ATK={stats.attack}, DEF={stats.defense}");
+        if (hpText != null) hpText.text = FormatStat(stats.maxHp);
+        if (attackText != null) attackText.text = FormatStat(stats.attack);
+        if (defenseText != null) defenseText.text = FormatStat(stats.defense);
     }
 
     private string FormatStat(int value)
