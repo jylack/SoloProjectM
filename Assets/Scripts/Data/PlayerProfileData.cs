@@ -11,6 +11,7 @@ public class PlayerProfileData
     public int diamonds;
     public int gold;
     public PlayerStatsData stats;
+    public PlayerAppearanceData appearance;
     public List<PlayerItemData> items;
     public List<PlayerSkillData> skills;
 
@@ -24,6 +25,7 @@ public class PlayerProfileData
             diamonds = 50,
             gold = 1000,
             stats = PlayerStatsData.CreateDefault(),
+            appearance = PlayerAppearanceData.CreateDefault(),
             items = new List<PlayerItemData>
             {
                 new PlayerItemData { itemId = "potion_small", quantity = 3 },
@@ -57,6 +59,34 @@ public class PlayerStatsData
             speed = 5,
             attackCount = 1,
             defense = 0
+        };
+    }
+}
+
+[Serializable]
+public class PlayerAppearanceData
+{
+    public string characterPrefabId;
+    public string portraitId;
+    public string bodyId;
+    public string eyeId;
+    public string hairId;
+    public string clothId;
+    public string weaponId;
+    public string shieldId;
+
+    public static PlayerAppearanceData CreateDefault()
+    {
+        return new PlayerAppearanceData
+        {
+            characterPrefabId = string.Empty,
+            portraitId = string.Empty,
+            bodyId = string.Empty,
+            eyeId = string.Empty,
+            hairId = string.Empty,
+            clothId = string.Empty,
+            weaponId = string.Empty,
+            shieldId = string.Empty
         };
     }
 }
